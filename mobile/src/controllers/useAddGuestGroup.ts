@@ -6,21 +6,35 @@ import { isValidPhone } from '../utils/validation';
 
 export const MAX_PEOPLE_PER_GROUP = 20;
 
+// "single": una persona que va sola. "group": una familia o grupo.
+// Por dentro, una persona sola es un grupo de una persona con su mismo nombre.
+export type AddMode = 'single' | 'group';
+
 type FieldErrors = {
   name?: string;
+  person?: string;
   phone?: string;
   people?: string;
 };
 
-// Lógica de la pantalla Agregar invitados: un grupo con su nombre, un WhatsApp opcional
-// y la lista de personas. onSaved se llama cuando el grupo quedó guardado.
+// Lógica de la pantalla Agregar invitados. onSaved se llama cuando quedó guardado.
 export function useAddGuestGroup(onSaved: () => void) {
+  const [mode, setMode] = useState<AddMode>('single');
+  // Solo para "Una persona".
+  const [personName, setPersonName] = useState('');
+  // Solo para "Grupo o familia".
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
   const [people, setPeople] = useState(['']);
+  const [phone, setPhone] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string>();
   const [loading, setLoading] = useState(false);
+
+  function changeMode(value: AddMode) {
+    setMode(value);
+    setFieldErrors({});
+    setFormError(undefined);
+  }
 
   function setPerson(index: number, value: string) {
     setPeople((current) => current.map((person, i) => (i === index ? value : person)));
@@ -36,14 +50,20 @@ export function useAddGuestGroup(onSaved: () => void) {
 
   function validate() {
     const errors: FieldErrors = {};
-    if (!name.trim()) {
-      errors.name = 'Escribí el nombre del grupo.';
+    if (mode === 'single') {
+      if (!personName.trim()) {
+        errors.person = 'Escribí el nombre y apellido.';
+      }
+    } else {
+      if (!name.trim()) {
+        errors.name = 'Escribí el nombre del grupo.';
+      }
+      if (!people.some((person) => person.trim())) {
+        errors.people = 'Escribí el nombre de al menos una persona.';
+      }
     }
     if (phone.trim() && !isValidPhone(phone.trim())) {
       errors.phone = 'Revisá el WhatsApp: escribí solo números, con el código de área.';
-    }
-    if (!people.some((person) => person.trim())) {
-      errors.people = 'Escribí el nombre de al menos una persona.';
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -57,11 +77,15 @@ export function useAddGuestGroup(onSaved: () => void) {
 
     setLoading(true);
     try {
-      await createGuestGroup({
-        name: name.trim(),
-        phone: phone.trim() || null,
-        guests: people.map((person) => person.trim()).filter(Boolean),
-      });
+      await createGuestGroup(
+        mode === 'single'
+          ? { name: personName.trim(), phone: phone.trim() || null, guests: [personName.trim()] }
+          : {
+              name: name.trim(),
+              phone: phone.trim() || null,
+              guests: people.map((person) => person.trim()).filter(Boolean),
+            },
+      );
       onSaved();
     } catch (error) {
       setFormError(
@@ -72,6 +96,10 @@ export function useAddGuestGroup(onSaved: () => void) {
   }
 
   return {
+    mode,
+    setMode: changeMode,
+    personName,
+    setPersonName,
     name,
     setName,
     phone,

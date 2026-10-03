@@ -62,7 +62,7 @@ export default function InvitadosScreen() {
         </>
       ) : guests.groups.length === 0 ? (
         <Text style={text.body}>
-          Todavía no agregaste invitados. Tocá el botón de arriba para sumar el primer grupo.
+          Todavía no agregaste invitados. Tocá el botón de arriba para sumar a los primeros.
         </Text>
       ) : (
         <>
@@ -81,6 +81,8 @@ export default function InvitadosScreen() {
                 name={group.name}
                 total={group.guests.length}
                 guests={group.visibleGuests}
+                // Alguien que va solo es un grupo de una persona con su mismo nombre.
+                showHeader={!(group.guests.length === 1 && group.guests[0].name === group.name)}
               />
             ))
           )}

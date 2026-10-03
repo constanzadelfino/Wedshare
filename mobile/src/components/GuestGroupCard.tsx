@@ -11,20 +11,24 @@ type Props = {
   // Cantidad total de personas del grupo, aunque el filtro muestre menos.
   total: number;
   guests: Guest[];
+  // false para alguien que va solo: se muestra solo su fila, sin repetir el nombre arriba.
+  showHeader?: boolean;
 };
 
 // Tarjeta de un grupo en la pantalla Invitados: nombre, cantidad y una fila por persona.
-export function GuestGroupCard({ name, total, guests }: Props) {
+export function GuestGroupCard({ name, total, guests, showHeader = true }: Props) {
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.name} accessibilityRole="header">
-          {name}
-        </Text>
-        <Text style={styles.count}>
-          {total} {total === 1 ? 'invitado' : 'invitados'}
-        </Text>
-      </View>
+      {showHeader ? (
+        <View style={styles.header}>
+          <Text style={styles.name} accessibilityRole="header">
+            {name}
+          </Text>
+          <Text style={styles.count}>
+            {total} {total === 1 ? 'invitado' : 'invitados'}
+          </Text>
+        </View>
+      ) : null}
       {guests.map((guest, index) => (
         <View
           key={guest.id}
