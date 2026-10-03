@@ -1,0 +1,102 @@
+import { Link } from 'expo-router';
+import { useRef, useState } from 'react';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+
+import { Button } from '../../components/Button';
+import { FooterLink } from '../../components/FooterLink';
+import { Logo } from '../../components/Logo';
+import { OrDivider } from '../../components/OrDivider';
+import { Screen } from '../../components/Screen';
+import { TextField } from '../../components/TextField';
+import { colors } from '../../theme/colors';
+import { fonts, text } from '../../theme/typography';
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const passwordRef = useRef<TextInput>(null);
+
+  return (
+    <Screen
+      topSpacing={88}
+      gap={28}
+      footer={<FooterLink question="¿No tenés cuenta?" linkText="Registrate" href="/registro" />}
+    >
+      <View style={styles.brand}>
+        <Logo width={60} />
+        <Text style={styles.wordmark} accessibilityRole="header">
+          Wedshare
+        </Text>
+        <View style={styles.rule} />
+        <Text style={text.body}>Todo tu casamiento, en un solo lugar.</Text>
+      </View>
+
+      <View style={styles.fields}>
+        <TextField
+          label="Email"
+          placeholder="tu@email.com"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoComplete="email"
+          textContentType="emailAddress"
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef.current?.focus()}
+          submitBehavior="submit"
+        />
+        <TextField
+          ref={passwordRef}
+          label="Contraseña"
+          placeholder="Tu contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          autoComplete="current-password"
+          textContentType="password"
+          returnKeyType="go"
+        />
+        <Link href="/recuperar-contrasena" style={[text.link, styles.forgot]} accessibilityRole="link">
+          Olvidé mi contraseña
+        </Link>
+      </View>
+
+      <View style={styles.actions}>
+        <Button title="Ingresar" />
+        <OrDivider />
+        <Button title="Continuar con Google" variant="secondary" />
+      </View>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  brand: {
+    gap: 10,
+  },
+  wordmark: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 48,
+    lineHeight: 54,
+    color: colors.text,
+  },
+  rule: {
+    width: 56,
+    height: 2,
+    backgroundColor: colors.accent,
+  },
+  fields: {
+    gap: 16,
+  },
+  // El padding lleva el área táctil a 44 px; el margen negativo conserva el espacio del diseño.
+  forgot: {
+    alignSelf: 'flex-end',
+    paddingVertical: 12,
+    marginVertical: -12,
+  },
+  actions: {
+    gap: 14,
+  },
+});
