@@ -38,8 +38,8 @@ model Event {
   rsvpDeadline DateTime? @map("rsvp_deadline") @db.Date
   dressCode    String?   @map("dress_code")
 
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   guestGroups GuestGroup[]
   items       EventItem[]
@@ -82,10 +82,14 @@ model GuestGroup {
   phone       String?
   // Parte del link de la invitación. Es secreto: quien lo tiene ve la invitación del grupo.
   inviteToken String   @unique @map("invite_token")
+  // Lo que lleva el QR de ingreso. Es distinto del link para que una foto del QR no abra la
+  // invitación. Se crea la primera vez que alguien del grupo confirma.
+  entryCode   String?  @unique @map("entry_code")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   guests Guest[]
+  rsvp   Rsvp?
 
   @@index([eventId])
   @@map("guest_groups")
@@ -105,9 +109,24 @@ model Guest {
   group     GuestGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   name      String
   status    GuestStatus @default(pending)
+  // Preferencia alimentaria que anota el invitado al confirmar. Ej: "vegetariano".
+  dietary   String?
   createdAt DateTime    @default(now()) @map("created_at")
   updatedAt DateTime    @updatedAt @map("updated_at")
 
   @@index([groupId])
   @@map("guests")
+}
+
+// Respuesta de un grupo a la invitación: una sola por grupo. Quién asiste queda en cada
+// invitado (guests.status y guests.dietary); acá va el mensaje para los novios.
+model Rsvp {
+  id        String     @id @default(uuid()) @db.Uuid
+  groupId   String     @unique @map("group_id") @db.Uuid
+  group     GuestGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  message   String?
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@map("rsvps")
 }

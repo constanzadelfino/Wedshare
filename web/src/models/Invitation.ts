@@ -6,6 +6,8 @@ export type InvitationGuest = {
   id: string;
   name: string;
   status: GuestStatus;
+  // Preferencia alimentaria que anotó al confirmar.
+  dietary: string | null;
 };
 
 export type InvitationItem = {
@@ -27,6 +29,10 @@ export type Invitation = {
   group: {
     name: string;
     guests: InvitationGuest[];
+    // La respuesta del grupo, si ya respondió.
+    rsvp: { message: string | null } | null;
+    // Lo que lleva el QR de ingreso. Solo viene si alguien del grupo confirmó.
+    entryCode: string | null;
   };
   event: {
     // Nombre del evento. Se muestra si los novios no cargaron sus nombres.
@@ -39,7 +45,15 @@ export type Invitation = {
     coverPhotoUrls: string[];
     coverWithoutPhotos: boolean;
     rsvpDeadline: string | null;
+    // true si ya pasó la fecha límite: no se puede confirmar ni cambiar la respuesta.
+    rsvpClosed: boolean;
     dressCode: string | null;
     items: InvitationItem[];
   };
+};
+
+// Lo que manda el invitado al confirmar o cambiar su respuesta.
+export type RsvpInput = {
+  guests: { id: string; attending: boolean; dietary: string | null }[];
+  message: string | null;
 };

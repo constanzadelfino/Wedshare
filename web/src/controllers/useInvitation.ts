@@ -24,5 +24,10 @@ export function useInvitation(inviteToken: string) {
     };
   }, [inviteToken, attempt]);
 
-  return { state, retry: () => setAttempt((value) => value + 1) };
+  return {
+    state,
+    retry: () => setAttempt((value) => value + 1),
+    // Reemplaza los datos, por ejemplo con lo que devuelve la API al confirmar.
+    replace: (invitation: Invitation) => setState({ status: 'ready', invitation }),
+  };
 }

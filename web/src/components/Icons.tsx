@@ -36,3 +36,28 @@ export function StarIcon() {
     </svg>
   );
 }
+
+export function CheckIcon({ size = 14, strokeWidth = 3 }: { size?: number; strokeWidth?: number }) {
+  return (
+    <svg {...common} width={size} height={size} strokeWidth={strokeWidth}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+export function LockIcon() {
+  return (
+    <svg {...common} width={28} height={28}>
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  );
+}
+
+export function DownloadIcon() {
+  return (
+    <svg {...common}>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+    </svg>
+  );
+}

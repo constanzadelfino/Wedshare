@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
-
 import { HeartLogo } from '../components/HeartLogo';
+import { useBodyScrollLock } from '../controllers/useBodyScrollLock';
 
 type Props = {
   initials: string[];
@@ -11,14 +10,7 @@ type Props = {
 // Pantalla de apertura: un sobre con el sello de las iniciales y el botón "Abrir".
 // La invitación ya está cargada debajo, así que al abrirse aparece sin esperas.
 export function OpeningScreen({ initials, leaving, onOpen }: Props) {
-  // Mientras el sobre está cerrado, la página de abajo no se desplaza.
-  useEffect(() => {
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, []);
+  useBodyScrollLock();
 
   return (
     <div

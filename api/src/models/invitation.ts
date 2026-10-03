@@ -5,7 +5,11 @@ import { GuestStatus } from './guest';
 export type InvitationData = {
   group: {
     name: string;
-    guests: { id: string; name: string; status: GuestStatus }[];
+    guests: { id: string; name: string; status: GuestStatus; dietary: string | null }[];
+    // La respuesta del grupo, si ya respondió.
+    rsvp: { message: string | null } | null;
+    // Lo que lleva el QR de ingreso. Solo viene si alguien del grupo confirmó.
+    entryCode: string | null;
   };
   event: {
     // Nombre del evento. Se muestra si los novios no cargaron sus nombres.
@@ -20,6 +24,8 @@ export type InvitationData = {
     coverWithoutPhotos: boolean;
     // Formato AAAA-MM-DD.
     rsvpDeadline: string | null;
+    // true si ya pasó la fecha límite: no se puede confirmar ni cambiar la respuesta.
+    rsvpClosed: boolean;
     dressCode: string | null;
     // Civil, ceremonia, festejo u otros, en orden cronológico.
     items: {
@@ -42,4 +48,65 @@ const INVITE_TOKEN_PATTERN = /^[A-Za-z0-9_-]{22}$/;
 
 export function isInviteToken(value: string) {
   return INVITE_TOKEN_PATTERN.test(value);
+}
+
+// La confirmación cierra al terminar el día límite, en horario de Argentina.
+export function isRsvpClosed(deadline: string | null, now = new Date()) {
+  return deadline !== null && now > new Date(`${deadline}T23:59:59-03:00`);
+}
+
+// Lo que manda el invitado al confirmar o cambiar su respuesta: cada persona del grupo,
+// si asiste y su preferencia alimentaria, y un mensaje opcional para los novios.
+export type RsvpInput = {
+  guests: { id: string; attending: boolean; dietary: string | null }[];
+  message: string | null;
+};
+
+const MAX_DIETARY = 120;
+const MAX_MESSAGE = 600;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type ValidationResult = { data: RsvpInput; error?: undefined } | { error: string };
+
+function optionalText(value: unknown) {
+  return typeof value === 'string' ? value.trim() || null : null;
+}
+
+export function validateRsvpInput(body: unknown): ValidationResult {
+  if (typeof body !== 'object' || body === null) {
+    return { error: 'Faltan los datos de la confirmación.' };
+  }
+  const input = body as Record<string, unknown>;
+  if (!Array.isArray(input.guests) || input.guests.length === 0) {
+    return { error: 'Faltan las personas de la invitación.' };
+  }
+
+  const guests: RsvpInput['guests'] = [];
+  for (const guest of input.guests) {
+    if (typeof guest !== 'object' || guest === null) {
+      return { error: 'Los datos de las personas no son válidos.' };
+    }
+    const { id, attending, dietary } = guest as Record<string, unknown>;
+    if (typeof id !== 'string' || !UUID_PATTERN.test(id) || typeof attending !== 'boolean') {
+      return { error: 'Los datos de las personas no son válidos.' };
+    }
+    if (dietary !== undefined && dietary !== null && typeof dietary !== 'string') {
+      return { error: 'La preferencia alimentaria tiene que ser un texto.' };
+    }
+    const text = attending ? optionalText(dietary) : null;
+    if (text && text.length > MAX_DIETARY) {
+      return { error: `La preferencia alimentaria puede tener hasta ${MAX_DIETARY} caracteres.` };
+    }
+    guests.push({ id, attending, dietary: text });
+  }
+
+  if (input.message !== undefined && input.message !== null && typeof input.message !== 'string') {
+    return { error: 'El mensaje tiene que ser un texto.' };
+  }
+  const message = optionalText(input.message);
+  if (message && message.length > MAX_MESSAGE) {
+    return { error: `El mensaje puede tener hasta ${MAX_MESSAGE} caracteres.` };
+  }
+
+  return { data: { guests, message } };
 }

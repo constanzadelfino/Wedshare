@@ -6,3 +6,5 @@ import * as invitationController from '../controllers/invitationController';
 export const invitationRoutes = Router();
 
 invitationRoutes.get('/:token', invitationController.get);
+invitationRoutes.post('/:token/rsvp', invitationController.createRsvp);
+invitationRoutes.patch('/:token/rsvp', invitationController.updateRsvp);

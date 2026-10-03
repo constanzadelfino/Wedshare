@@ -8,7 +8,7 @@ import { StatusScreen } from './StatusScreen';
 // Página de la invitación de un grupo: carga los datos, muestra el sobre la primera vez
 // y después la invitación.
 export function InvitationPage({ inviteToken }: { inviteToken: string }) {
-  const { state, retry } = useInvitation(inviteToken);
+  const { state, retry, replace } = useInvitation(inviteToken);
   const opening = useOpening(inviteToken);
 
   if (state.status === 'loading') {
@@ -20,7 +20,7 @@ export function InvitationPage({ inviteToken }: { inviteToken: string }) {
 
   return (
     <>
-      <InvitationView invitation={state.invitation} />
+      <InvitationView inviteToken={inviteToken} invitation={state.invitation} onChange={replace} />
       {opening.phase !== 'open' && (
         <OpeningScreen
           initials={coupleInitials(state.invitation.event.coupleNames)}
