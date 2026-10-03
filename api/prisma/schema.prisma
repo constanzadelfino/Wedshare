@@ -1,0 +1,11 @@
+// Modelos de la base de datos (la "M" del MVC).
+// Cada modelo se convierte en una tabla al correr una migración.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
