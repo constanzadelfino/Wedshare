@@ -4,17 +4,61 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Button } from '../../components/Button';
 import { FooterLink } from '../../components/FooterLink';
+import { FormError } from '../../components/FormError';
 import { Logo } from '../../components/Logo';
 import { OrDivider } from '../../components/OrDivider';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
+import { authErrorMessage, isValidEmail } from '../../lib/authErrors';
+import { supabase } from '../../lib/supabase';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
+
+type FieldErrors = {
+  email?: string;
+  password?: string;
+};
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState<string>();
+  const [loading, setLoading] = useState(false);
   const passwordRef = useRef<TextInput>(null);
+
+  function validate() {
+    const errors: FieldErrors = {};
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      errors.email = 'Escribí tu email.';
+    } else if (!isValidEmail(trimmedEmail)) {
+      errors.email = 'Revisá el email: parece que no es válido.';
+    }
+    if (!password) {
+      errors.password = 'Escribí tu contraseña.';
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  async function handleLogin() {
+    setFormError(undefined);
+    if (!validate()) {
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    // Si sale bien, la app pasa sola al Inicio porque cambia la sesión.
+    if (error) {
+      setFormError(authErrorMessage(error));
+      setLoading(false);
+    }
+  }
 
   return (
     <Screen
@@ -37,6 +81,7 @@ export default function LoginScreen() {
           placeholder="tu@email.com"
           value={email}
           onChangeText={setEmail}
+          error={fieldErrors.email}
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
@@ -51,11 +96,13 @@ export default function LoginScreen() {
           placeholder="Tu contraseña"
           value={password}
           onChangeText={setPassword}
+          error={fieldErrors.password}
           secureTextEntry
           autoCapitalize="none"
           autoComplete="current-password"
           textContentType="password"
           returnKeyType="go"
+          onSubmitEditing={handleLogin}
         />
         <Link href="/recuperar-contrasena" style={[text.link, styles.forgot]} accessibilityRole="link">
           Olvidé mi contraseña
@@ -63,9 +110,10 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.actions}>
-        <Button title="Ingresar" />
+        <FormError message={formError} />
+        <Button title="Ingresar" loading={loading} onPress={handleLogin} />
         <OrDivider />
-        <Button title="Continuar con Google" variant="secondary" />
+        <Button title="Continuar con Google" variant="secondary" disabled={loading} />
       </View>
     </Screen>
   );
