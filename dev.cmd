@@ -1,5 +1,5 @@
 @echo off
-rem Levanta todo Wedshare para probar en el celular: la API y la app (Expo).
+rem Levanta todo Wedshare para probar en el celular: la API, la app (Expo) y la web del invitado.
 rem Uso: doble clic en este archivo, o escribir "dev" en una terminal abierta en esta carpeta.
 
 cd /d "%~dp0"
@@ -20,9 +20,10 @@ if errorlevel 1 (
   exit /b 1
 )
 
-rem 2. Abre una ventana para la API y otra para la app.
+rem 2. Abre una ventana para la API, otra para la app y otra para la web del invitado.
 start "Wedshare API" cmd /k "cd /d ""%~dp0api"" && npm run dev"
 start "Wedshare App" cmd /k "cd /d ""%~dp0mobile"" && npx.cmd expo start --clear"
+start "Wedshare Web" cmd /k "cd /d ""%~dp0web"" && npm run dev"
 
-echo Listo: se abrieron las ventanas "Wedshare API" y "Wedshare App".
+echo Listo: se abrieron las ventanas "Wedshare API", "Wedshare App" y "Wedshare Web".
 echo Escanea el QR de la ventana de la app con Expo Go.

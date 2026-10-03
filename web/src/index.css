@@ -1,0 +1,175 @@
+@import 'tailwindcss';
+
+/*
+ * Colores de la plantilla. Hoy es Dorado clásico; las otras plantillas van a cambiar
+ * estas variables (y la fuente de títulos) sin tocar las secciones.
+ */
+:root {
+  --tpl-accent: #7a5b22;
+  --tpl-gold: #c9a45c;
+  --tpl-dark: #2a1f14;
+  --tpl-bg: #f7f1e6;
+  --tpl-ink: #2e2418;
+  --tpl-card: #fffdf8;
+  /* Fondo y texto de la pantalla de apertura (el sobre). */
+  --tpl-envelope: #efe5d1;
+  --tpl-envelope-text: #6b5a44;
+  --tpl-font-display: 'Figtree', sans-serif;
+}
+
+@theme inline {
+  --font-sans: 'Figtree', sans-serif;
+  --font-display: var(--tpl-font-display);
+
+  --color-accent: var(--tpl-accent);
+  --color-gold: var(--tpl-gold);
+  --color-dark: var(--tpl-dark);
+  --color-bg: var(--tpl-bg);
+  --color-ink: var(--tpl-ink);
+  --color-card: var(--tpl-card);
+  --color-envelope: var(--tpl-envelope);
+  --color-envelope-text: var(--tpl-envelope-text);
+  /* Tonos derivados, igual que en el diseño. */
+  --color-muted: color-mix(in srgb, var(--tpl-ink) 72%, var(--tpl-bg));
+  --color-mdark: color-mix(in srgb, var(--tpl-bg) 78%, var(--tpl-dark));
+  --color-line: color-mix(in srgb, var(--tpl-ink) 14%, var(--tpl-bg));
+  --color-soft: color-mix(in srgb, var(--tpl-accent) 10%, var(--tpl-bg));
+
+  --shadow-card: 0 14px 34px rgba(46, 36, 24, 0.08);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Nunca cursiva, tampoco en los textos que el navegador inclina por defecto. */
+  em,
+  i,
+  cite,
+  address {
+    font-style: normal;
+  }
+}
+
+/* Piezas que se repiten en todas las secciones (medidas del diseño). */
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .sec {
+    padding: 56px 0;
+  }
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 0 0 10px;
+  }
+  .h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    margin: 0 0 12px;
+  }
+  .names {
+    font-family: var(--font-display);
+    line-height: 1.15;
+    font-size: 34px;
+    font-weight: 300;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 22px;
+    box-shadow: var(--shadow-card);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 0 26px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-solid {
+    border: 0;
+    background: var(--color-dark);
+    color: var(--color-bg);
+  }
+  .btn-outline {
+    border: 1.5px solid var(--color-accent);
+    background: transparent;
+    color: var(--color-accent);
+  }
+
+  @media (min-width: 760px) {
+    .wrap {
+      padding: 0 32px;
+    }
+    .sec {
+      padding: 88px 0;
+    }
+    .h2 {
+      font-size: 44px;
+    }
+    .names {
+      font-size: 58px;
+    }
+  }
+}
+
+/* Apertura: la solapa del sobre se levanta y la pantalla se desvanece. */
+@keyframes flap-open {
+  to {
+    transform: translateY(-105%);
+  }
+}
+@keyframes seal-out {
+  to {
+    opacity: 0;
+    scale: 0.85;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.opening-leave .opening-flap {
+  animation: flap-open 700ms cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+.opening-leave .opening-seal {
+  animation: seal-out 400ms ease-in forwards;
+}
+.opening-leave {
+  animation: fade-out 350ms ease-in 650ms forwards;
+}
