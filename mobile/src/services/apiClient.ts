@@ -37,7 +37,9 @@ export async function apiRequest<T>(method: Method, path: string, body?: unknown
       },
       body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
-  } catch {
+  } catch (error) {
+    // La causa real queda en la consola de Expo; en pantalla, un mensaje claro.
+    console.warn(`Falló el pedido ${method} ${path}`, error);
     throw new ApiError('No pudimos conectarnos con el servidor. Revisá tu conexión e intentá de nuevo.');
   }
 

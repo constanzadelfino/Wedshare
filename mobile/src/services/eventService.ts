@@ -1,3 +1,5 @@
+import { File } from 'expo-file-system';
+
 import { Event, EventChanges, NewEvent } from '../models/Event';
 import { apiRequest } from './apiClient';
 
@@ -20,10 +22,11 @@ export function updateEvent(id: string, changes: EventChanges) {
 }
 
 // Sube una foto de portada (ya achicada) desde el archivo del celular.
+// El fetch de Expo no acepta el formato { uri, name, type } de React Native:
+// el archivo tiene que ir como File de expo-file-system.
 export function uploadCoverPhoto(id: string, fileUri: string) {
   const form = new FormData();
-  // React Native acepta { uri, name, type } como archivo dentro de un FormData.
-  form.append('photo', { uri: fileUri, name: 'portada.jpg', type: 'image/jpeg' } as unknown as Blob);
+  form.append('photo', new File(fileUri));
   return apiRequest<Event>('POST', `/events/${id}/cover-photos`, form);
 }
 
