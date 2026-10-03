@@ -10,26 +10,37 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import { colors } from '../theme/colors';
 
-// La pantalla de carga se mantiene hasta que la fuente esté lista.
+// La pantalla de carga se mantiene hasta que estén listas la fuente y la sesión.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
+  return (
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
+  );
+}
+
+function RootNavigator() {
+  const { session, isLoading } = useAuth();
+  const [fontsLoaded, fontError] = useFonts({
     Figtree_400Regular,
     Figtree_500Medium,
     Figtree_600SemiBold,
     Figtree_700Bold,
   });
+  const isReady = (fontsLoaded || !!fontError) && !isLoading;
 
   useEffect(() => {
-    if (loaded || error) {
+    if (isReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [isReady]);
 
-  if (!loaded && !error) {
+  if (!isReady) {
     return null;
   }
 
@@ -41,7 +52,15 @@ export default function RootLayout() {
           headerShown: false,
           contentStyle: { backgroundColor: colors.background },
         }}
-      />
+      >
+        {/* Sin sesión solo se puede ver el acceso; con sesión, solo la app. */}
+        <Stack.Protected guard={!session}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+        <Stack.Protected guard={!!session}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+      </Stack>
     </>
   );
 }
