@@ -9,6 +9,7 @@ import { GuestGroupCard } from '../../../components/GuestGroupCard';
 import { Screen } from '../../../components/Screen';
 import { SearchField } from '../../../components/SearchField';
 import { GuestFilter, useGuests } from '../../../controllers/useGuests';
+import { isSingleGuest } from '../../../models/Guest';
 import { colors } from '../../../theme/colors';
 import { text } from '../../../theme/typography';
 
@@ -81,8 +82,8 @@ export default function InvitadosScreen() {
                 name={group.name}
                 total={group.guests.length}
                 guests={group.visibleGuests}
-                // Alguien que va solo es un grupo de una persona con su mismo nombre.
-                showHeader={!(group.guests.length === 1 && group.guests[0].name === group.name)}
+                showHeader={!isSingleGuest(group)}
+                onPress={() => router.push({ pathname: '/editar-grupo', params: { id: group.id } })}
               />
             ))
           )}

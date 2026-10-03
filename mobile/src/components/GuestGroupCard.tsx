@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Guest } from '../models/Guest';
@@ -13,12 +13,19 @@ type Props = {
   guests: Guest[];
   // false para alguien que va solo: se muestra solo su fila, sin repetir el nombre arriba.
   showHeader?: boolean;
+  // Al tocar la tarjeta se abre el grupo (compartir el link, editar o borrar).
+  onPress: () => void;
 };
 
 // Tarjeta de un grupo en la pantalla Invitados: nombre, cantidad y una fila por persona.
-export function GuestGroupCard({ name, total, guests, showHeader = true }: Props) {
+export function GuestGroupCard({ name, total, guests, showHeader = true, onPress }: Props) {
   return (
-    <View style={styles.card}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Abrir ${name}`}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    >
       {showHeader ? (
         <View style={styles.header}>
           <Text style={styles.name} accessibilityRole="header">
@@ -53,7 +60,7 @@ export function GuestGroupCard({ name, total, guests, showHeader = true }: Props
           <StatusBadge status={guest.status} />
         </View>
       ))}
-    </View>
+    </Pressable>
   );
 }
 
@@ -64,6 +71,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 18,
     overflow: 'hidden',
+  },
+  pressed: {
+    opacity: 0.85,
   },
   header: {
     flexDirection: 'row',

@@ -1,16 +1,16 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/Button';
 import { FilterChips } from '../../components/FilterChips';
 import { FormError } from '../../components/FormError';
+import { PersonRow } from '../../components/PersonRow';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
 import { AddMode, useAddGuestGroup } from '../../controllers/useAddGuestGroup';
 import { colors } from '../../theme/colors';
-import { fonts, radius, text } from '../../theme/typography';
+import { fonts, text } from '../../theme/typography';
 
 const MODES: { value: AddMode; label: string }[] = [
   { value: 'single', label: 'Una persona' },
@@ -85,39 +85,13 @@ export default function AgregarInvitadosScreen() {
         <View style={styles.people}>
           <Text style={text.sectionLabel}>Personas</Text>
           {form.people.map((person, index) => (
-            <View key={index} style={styles.personRow}>
-              <View style={styles.personField}>
-                <TextField
-                  label={`Persona ${index + 1}`}
-                  placeholder="Nombre y apellido"
-                  value={person}
-                  onChangeText={(value) => form.setPerson(index, value)}
-                  autoCapitalize="words"
-                  autoComplete="off"
-                />
-              </View>
-              {form.people.length > 1 ? (
-                <Pressable
-                  onPress={() => form.removePerson(index)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Quitar persona ${index + 1}`}
-                  style={({ pressed }) => [styles.removeButton, pressed && styles.pressed]}
-                >
-                  <Svg
-                    width={20}
-                    height={20}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke={colors.text}
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <Path d="M18 6L6 18M6 6l12 12" />
-                  </Svg>
-                </Pressable>
-              ) : null}
-            </View>
+            <PersonRow
+              key={index}
+              index={index}
+              value={person}
+              onChangeText={(value) => form.setPerson(index, value)}
+              onRemove={form.people.length > 1 ? () => form.removePerson(index) : undefined}
+            />
           ))}
           {form.fieldErrors.people ? (
             <Text style={styles.error}>{form.fieldErrors.people}</Text>
@@ -137,28 +111,6 @@ const styles = StyleSheet.create({
   },
   people: {
     gap: 12,
-  },
-  personRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 10,
-  },
-  personField: {
-    flex: 1,
-  },
-  // Mismo alto que el campo (52 px) para que quede alineado.
-  removeButton: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.control,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pressed: {
-    opacity: 0.7,
   },
   error: {
     fontFamily: fonts.medium,

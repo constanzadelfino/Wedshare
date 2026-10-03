@@ -17,6 +17,18 @@ export type GuestGroup = {
   guests: Guest[];
 };
 
+// Al editar: si una persona trae id, se conserva (con su respuesta); si no, se agrega.
+export type GuestGroupChanges = {
+  name?: string;
+  phone?: string | null;
+  guests?: { id?: string; name: string }[];
+};
+
+// Alguien que va solo se guarda como un grupo de una persona con su mismo nombre.
+export function isSingleGuest(group: GuestGroup) {
+  return group.guests.length === 1 && group.guests[0].name === group.name;
+}
+
 export type NewGuestGroup = {
   name: string;
   phone: string | null;

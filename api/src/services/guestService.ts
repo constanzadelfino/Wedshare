@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 
 import { Guest, GuestGroup } from '../../generated/prisma/client';
 import { prisma } from '../lib/prisma';
-import { GuestGroupData, GuestGroupInput } from '../models/guest';
+import { GuestGroupData, GuestGroupInput, GuestGroupUpdate } from '../models/guest';
 
 // Los grupos se buscan siempre a través del evento del usuario:
 // cada pareja solo ve y toca a sus invitados.
@@ -48,17 +48,32 @@ export async function createGuestGroup(eventId: string, input: GuestGroupInput) 
 }
 
 // Devuelve null si el grupo no existe o es de otro evento.
-export async function updateGuestGroup(
-  eventId: string,
-  id: string,
-  input: Partial<Omit<GuestGroupInput, 'guests'>>,
-) {
-  const { count } = await prisma.guestGroup.updateMany({ where: { id, eventId }, data: input });
-  if (!count) {
+export async function updateGuestGroup(eventId: string, id: string, input: GuestGroupUpdate) {
+  const { guests, ...groupData } = input;
+  const group = await prisma.guestGroup.findFirst({ where: { id, eventId }, select: { id: true } });
+  if (!group) {
     return null;
   }
-  const group = await prisma.guestGroup.findUniqueOrThrow({ where: { id }, include: withGuests });
-  return toGuestGroupData(group);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.guestGroup.update({ where: { id }, data: groupData });
+    if (guests) {
+      const keptIds = guests.flatMap((guest) => (guest.id ? [guest.id] : []));
+      // Las personas que ya no están en la lista se quitan del grupo.
+      await tx.guest.deleteMany({ where: { groupId: id, id: { notIn: keptIds } } });
+      for (const guest of guests) {
+        if (guest.id) {
+          // Solo se renombra si la persona es de este grupo; un id ajeno no hace nada.
+          await tx.guest.updateMany({ where: { id: guest.id, groupId: id }, data: { name: guest.name } });
+        } else {
+          await tx.guest.create({ data: { groupId: id, name: guest.name } });
+        }
+      }
+    }
+  });
+
+  const updated = await prisma.guestGroup.findUniqueOrThrow({ where: { id }, include: withGuests });
+  return toGuestGroupData(updated);
 }
 
 // Borra el grupo con sus personas. Devuelve false si no existe o es de otro evento.
