@@ -1,7 +1,8 @@
+import { router } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { colors } from '../../../theme/colors';
 import { fonts } from '../../../theme/typography';
@@ -40,8 +41,19 @@ function GuestsIcon({ color }: IconProps) {
   );
 }
 
-// Barra de pestañas de abajo. Por ahora solo Inicio e Invitados;
-// QR, Playlist y Perfil se suman cuando existan esas pantallas.
+function QrIcon({ color }: IconProps) {
+  return (
+    <Svg {...iconSvgProps(color)}>
+      <Rect x={3} y={3} width={7} height={7} />
+      <Rect x={14} y={3} width={7} height={7} />
+      <Rect x={3} y={14} width={7} height={7} />
+      <Path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h1" />
+    </Svg>
+  );
+}
+
+// Barra de pestañas de abajo. Por ahora Inicio, Invitados y QR;
+// Playlist y Perfil se suman cuando existan esas pantallas.
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(16, insets.bottom);
@@ -75,6 +87,17 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="invitados"
         options={{ title: 'Invitados', tabBarIcon: ({ color }) => <GuestsIcon color={color} /> }}
+      />
+      {/* El escáner ocupa toda la pantalla (sin la barra), así que la pestaña lo abre encima. */}
+      <Tabs.Screen
+        name="qr"
+        options={{ title: 'QR', tabBarIcon: ({ color }) => <QrIcon color={color} /> }}
+        listeners={{
+          tabPress: (event) => {
+            event.preventDefault();
+            router.push('/escanear');
+          },
+        }}
       />
     </Tabs>
   );

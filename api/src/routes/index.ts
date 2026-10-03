@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { getHealth } from '../controllers/healthController';
+import { entryRoutes } from './entryRoutes';
 import { eventItemRoutes } from './eventItemRoutes';
 import { eventRoutes } from './eventRoutes';
 import { guestGroupRoutes } from './guestGroupRoutes';
@@ -16,3 +17,4 @@ router.use('/event-items', eventItemRoutes);
 router.use('/guest-groups', guestGroupRoutes);
 router.use('/places', placesRoutes);
 router.use('/invitations', invitationRoutes);
+router.use('/entry-passes', entryRoutes);

@@ -20,6 +20,12 @@ export const colors = {
   pendingText: '#7A5A12',
   declinedBackground: '#F1DDD8',
   declinedText: '#8A3B2E',
+  // Escaneo en la entrada: fondo oscuro detrás de la cámara, botones redondos y textos claros.
+  scannerBackground: '#1A130C',
+  scannerButton: '#2B2116',
+  scannerBorder: '#4A3B28',
+  scannerText: '#F7F1E6',
+  scannerHint: '#E8DCC4',
   // No está en el diseño: tono para mensajes de error, con buen contraste sobre el crema.
   error: '#A33A2B',
 } as const;

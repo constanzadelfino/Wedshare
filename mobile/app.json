@@ -31,6 +31,14 @@
         {
           "photosPermission": "Wedshare usa tus fotos para la portada de la invitación."
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Wedshare usa la cámara para escanear el QR de los invitados en la entrada.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "scheme": "wedshare",
