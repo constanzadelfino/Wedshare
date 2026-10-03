@@ -10,6 +10,9 @@ export const colors = {
   placeholder: '#7A6A54',
   darkBrown: '#3A2C1B',
   lightGold: '#E2C58A',
+  // Fondo de los íconos en las filas con interruptor y riel del interruptor apagado.
+  iconBackground: '#EADFC9',
+  switchOff: '#CDBE9E',
   // No está en el diseño: tono para mensajes de error, con buen contraste sobre el crema.
   error: '#A33A2B',
 } as const;
