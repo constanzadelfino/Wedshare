@@ -1,35 +1,31 @@
-import { Session } from '@supabase/supabase-js';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
-import { supabase } from '../lib/supabase';
+import { User } from '../models/User';
+import { getCurrentUser, onAuthChange } from '../services/authService';
 
 type AuthState = {
-  session: Session | null;
+  user: User | null;
   // true mientras se lee la sesión guardada en el celular al abrir la app.
   isLoading: boolean;
 };
 
-const AuthContext = createContext<AuthState>({ session: null, isLoading: true });
+const AuthContext = createContext<AuthState>({ user: null, isLoading: true });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    getCurrentUser().then((currentUser) => {
+      setUser(currentUser);
       setIsLoading(false);
     });
 
     // Se entera de cada ingreso, registro o cierre de sesión.
-    const { data } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
-
-    return () => data.subscription.unsubscribe();
+    return onAuthChange(setUser);
   }, []);
 
-  return <AuthContext.Provider value={{ session, isLoading }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, isLoading }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

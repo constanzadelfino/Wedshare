@@ -25,7 +25,7 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { session, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [fontsLoaded, fontError] = useFonts({
     Figtree_400Regular,
     Figtree_500Medium,
@@ -54,10 +54,10 @@ function RootNavigator() {
         }}
       >
         {/* Sin sesión solo se puede ver el acceso; con sesión, solo la app. */}
-        <Stack.Protected guard={!session}>
+        <Stack.Protected guard={!user}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
-        <Stack.Protected guard={!!session}>
+        <Stack.Protected guard={!!user}>
           <Stack.Screen name="(app)" />
         </Stack.Protected>
       </Stack>

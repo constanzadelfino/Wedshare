@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Button } from '../../components/Button';
@@ -8,63 +8,24 @@ import { OrDivider } from '../../components/OrDivider';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
-import { authErrorMessage, isValidEmail, MIN_PASSWORD_LENGTH } from '../../lib/authErrors';
-import { supabase } from '../../lib/supabase';
+import { useSignUp } from '../../controllers/useSignUp';
 import { text } from '../../theme/typography';
 
-type FieldErrors = {
-  name?: string;
-  email?: string;
-  password?: string;
-};
-
 export default function RegistroScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [formError, setFormError] = useState<string>();
-  const [loading, setLoading] = useState(false);
+  const {
+    name,
+    setName,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    fieldErrors,
+    formError,
+    loading,
+    handleSignUp,
+  } = useSignUp();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-
-  function validate() {
-    const errors: FieldErrors = {};
-    const trimmedEmail = email.trim();
-    if (!name.trim()) {
-      errors.name = 'Escribí tu nombre.';
-    }
-    if (!trimmedEmail) {
-      errors.email = 'Escribí tu email.';
-    } else if (!isValidEmail(trimmedEmail)) {
-      errors.email = 'Revisá el email: parece que no es válido.';
-    }
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      errors.password = `La contraseña tiene que tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`;
-    }
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  }
-
-  async function handleSignUp() {
-    setFormError(undefined);
-    if (!validate()) {
-      return;
-    }
-
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
-      password,
-      // El nombre queda en los datos del usuario, donde también lo guarda Google.
-      options: { data: { full_name: name.trim() } },
-    });
-    // Si sale bien, la app pasa sola al Inicio porque se crea la sesión.
-    if (error) {
-      setFormError(authErrorMessage(error));
-      setLoading(false);
-    }
-  }
 
   return (
     <Screen

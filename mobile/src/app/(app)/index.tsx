@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/Button';
@@ -6,37 +5,23 @@ import { FormError } from '../../components/FormError';
 import { Logo } from '../../components/Logo';
 import { Screen } from '../../components/Screen';
 import { useAuth } from '../../context/AuthContext';
-import { authErrorMessage } from '../../lib/authErrors';
-import { supabase } from '../../lib/supabase';
+import { useSignOut } from '../../controllers/useSignOut';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
 
 // Inicio provisorio para probar el ingreso. Se reemplaza por la pantalla 03 del diseño.
 export default function InicioScreen() {
-  const { session } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>();
-
-  const name: string | undefined = session?.user.user_metadata?.full_name;
-
-  async function handleSignOut() {
-    setError(undefined);
-    setLoading(true);
-    const { error: signOutError } = await supabase.auth.signOut();
-    if (signOutError) {
-      setError(authErrorMessage(signOutError));
-      setLoading(false);
-    }
-  }
+  const { user } = useAuth();
+  const { loading, error, handleSignOut } = useSignOut();
 
   return (
     <Screen topSpacing={88} gap={24}>
       <View style={styles.header}>
         <Logo width={44} />
         <Text style={styles.title} accessibilityRole="header">
-          {name ? `Hola, ${name}` : 'Hola'}
+          {user?.name ? `Hola, ${user.name}` : 'Hola'}
         </Text>
-        <Text style={text.body}>Ingresaste como {session?.user.email}.</Text>
+        <Text style={text.body}>Ingresaste como {user?.email}.</Text>
       </View>
 
       <Text style={text.body}>

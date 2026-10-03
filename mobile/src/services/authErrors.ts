@@ -1,12 +1,6 @@
 import { AuthError } from '@supabase/supabase-js';
 
-export const MIN_PASSWORD_LENGTH = 6;
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export function isValidEmail(email: string) {
-  return EMAIL_PATTERN.test(email);
-}
+import { MIN_PASSWORD_LENGTH } from '../utils/validation';
 
 // Traduce los errores de Supabase Auth a mensajes en español para mostrar en pantalla.
 export function authErrorMessage(error: AuthError) {
