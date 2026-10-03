@@ -9,3 +9,25 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// Un casamiento. Lo crean los novios desde la app.
+model Event {
+  id              String   @id @default(uuid()) @db.Uuid
+  // Usuario de Supabase Auth que creó el evento.
+  ownerId         String   @map("owner_id") @db.Uuid
+  name            String
+  // Solo la fecha, sin hora.
+  date            DateTime @db.Date
+  // Salón o dirección.
+  venue           String
+  // "Google Calendar: se actualiza si cambia la fecha".
+  calendarSync    Boolean  @default(true) @map("calendar_sync")
+  // Módulos opcionales.
+  playlistEnabled Boolean  @default(true) @map("playlist_enabled")
+  giftsEnabled    Boolean  @default(true) @map("gifts_enabled")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("events")
+}
