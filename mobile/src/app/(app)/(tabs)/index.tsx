@@ -57,6 +57,13 @@ export default function InicioScreen() {
         {!events.loading && !events.error && events.events.length === 0 ? (
           <Button title="Crear evento" onPress={() => router.push('/crear-evento')} />
         ) : null}
+        {events.events.length > 0 ? (
+          <Button
+            title="Personalizar invitación"
+            variant="outline"
+            onPress={() => router.push('/personalizar')}
+          />
+        ) : null}
       </View>
 
       <FormError message={error} />

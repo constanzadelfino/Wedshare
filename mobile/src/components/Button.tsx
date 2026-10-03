@@ -6,7 +6,8 @@ import { radius, text } from '../theme/typography';
 type Props = {
   title: string;
   onPress?: () => void;
-  variant?: 'primary' | 'secondary';
+  // outline: borde dorado y fondo transparente, como "Agregar evento".
+  variant?: 'primary' | 'secondary' | 'outline';
   loading?: boolean;
   disabled?: boolean;
 };
@@ -14,6 +15,7 @@ type Props = {
 export function Button({ title, onPress, variant = 'primary', loading = false, disabled = false }: Props) {
   const isPrimary = variant === 'primary';
   const isDisabled = disabled || loading;
+  const textColor = isPrimary ? colors.card : variant === 'outline' ? colors.accentText : colors.text;
 
   return (
     <Pressable
@@ -24,7 +26,7 @@ export function Button({ title, onPress, variant = 'primary', loading = false, d
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.secondary,
+        styles[variant],
         pressed && styles.pressed,
         isDisabled && styles.disabled,
       ]}
@@ -32,7 +34,7 @@ export function Button({ title, onPress, variant = 'primary', loading = false, d
       {loading ? (
         <ActivityIndicator color={isPrimary ? colors.card : colors.accent} />
       ) : (
-        <Text style={[text.button, { color: isPrimary ? colors.card : colors.text }]}>{title}</Text>
+        <Text style={[text.button, { color: textColor }]}>{title}</Text>
       )}
     </Pressable>
   );
@@ -53,6 +55,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  outline: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: colors.accent,
   },
   pressed: {
     opacity: 0.85,

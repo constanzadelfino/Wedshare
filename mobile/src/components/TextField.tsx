@@ -10,7 +10,7 @@ type Props = TextInputProps & {
 };
 
 export const TextField = forwardRef<TextInput, Props>(function TextField(
-  { label, error, style, ...inputProps },
+  { label, error, style, multiline, ...inputProps },
   ref,
 ) {
   return (
@@ -20,7 +20,8 @@ export const TextField = forwardRef<TextInput, Props>(function TextField(
         ref={ref}
         placeholderTextColor={colors.placeholder}
         accessibilityLabel={label}
-        style={[styles.input, error ? styles.inputError : null, style]}
+        multiline={multiline}
+        style={[styles.input, multiline && styles.multiline, error ? styles.inputError : null, style]}
         {...inputProps}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -43,6 +44,14 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontSize: 16,
     color: colors.text,
+  },
+  // Para textos largos, como el mensaje de bienvenida.
+  multiline: {
+    height: undefined,
+    minHeight: 104,
+    paddingTop: 14,
+    paddingBottom: 14,
+    textAlignVertical: 'top',
   },
   inputError: {
     borderColor: colors.error,

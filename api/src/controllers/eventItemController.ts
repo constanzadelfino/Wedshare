@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 
 import { isUuid } from '../lib/uuid';
-import { validateGuestGroupInput, validateGuestGroupUpdate } from '../models/guest';
+import { EventItemInput, validateEventItemInput } from '../models/eventItem';
+import * as eventItemService from '../services/eventItemService';
 import { getOwnerEventId } from '../services/eventService';
-import * as guestService from '../services/guestService';
 
 const NO_EVENT = { error: 'Primero creá tu evento.' };
-const NOT_FOUND = { error: 'No encontramos ese grupo.' };
+const NOT_FOUND = { error: 'No encontramos ese evento.' };
 
 type IdParams = { id: string };
 
@@ -19,30 +19,32 @@ async function requireEventId(res: Response) {
   return eventId;
 }
 
-// GET /guest-groups
+// GET /event-items
 export async function list(_req: Request, res: Response) {
   const eventId = await requireEventId(res);
   if (eventId) {
-    res.json(await guestService.listGuestGroups(eventId));
+    res.json(await eventItemService.listEventItems(eventId));
   }
 }
 
-// POST /guest-groups
+// POST /event-items
 export async function create(req: Request, res: Response) {
-  const result = validateGuestGroupInput(req.body);
+  const result = validateEventItemInput(req.body, false);
   if (result.error !== undefined) {
     res.status(400).json({ error: result.error });
     return;
   }
   const eventId = await requireEventId(res);
   if (eventId) {
-    res.status(201).json(await guestService.createGuestGroup(eventId, result.data));
+    // Al crear, la validación ya exige todos los campos obligatorios.
+    const item = await eventItemService.createEventItem(eventId, result.data as EventItemInput);
+    res.status(201).json(item);
   }
 }
 
-// PATCH /guest-groups/:id
+// PATCH /event-items/:id
 export async function update(req: Request<IdParams>, res: Response) {
-  const result = validateGuestGroupUpdate(req.body);
+  const result = validateEventItemInput(req.body, true);
   if (result.error !== undefined) {
     res.status(400).json({ error: result.error });
     return;
@@ -51,25 +53,24 @@ export async function update(req: Request<IdParams>, res: Response) {
   if (!eventId) {
     return;
   }
-  const group = isUuid(req.params.id)
-    ? await guestService.updateGuestGroup(eventId, req.params.id, result.data)
+  const item = isUuid(req.params.id)
+    ? await eventItemService.updateEventItem(eventId, req.params.id, result.data)
     : null;
-  if (!group) {
+  if (!item) {
     res.status(404).json(NOT_FOUND);
     return;
   }
-  res.json(group);
+  res.json(item);
 }
 
-// DELETE /guest-groups/:id
+// DELETE /event-items/:id
 export async function remove(req: Request<IdParams>, res: Response) {
   const eventId = await requireEventId(res);
   if (!eventId) {
     return;
   }
   const deleted =
-    isUuid(req.params.id) &&
-    (await guestService.deleteGuestGroup(eventId, req.params.id));
+    isUuid(req.params.id) && (await eventItemService.deleteEventItem(eventId, req.params.id));
   if (!deleted) {
     res.status(404).json(NOT_FOUND);
     return;

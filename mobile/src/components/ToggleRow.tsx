@@ -5,7 +5,8 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/typography';
 
 type Props = {
-  icon: ReactNode;
+  // Opcional: algunas filas del diseño, como "Portada sin fotos", van sin ícono.
+  icon?: ReactNode;
   title: string;
   subtitle?: string;
   value: boolean;
@@ -22,9 +23,9 @@ export function ToggleRow({ icon, title, subtitle, value, onChange }: Props) {
       accessibilityLabel={title}
       accessibilityHint={subtitle}
       accessibilityState={{ checked: value }}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.row, !icon && styles.rowWithoutIcon, pressed && styles.pressed]}
     >
-      <View style={styles.icon}>{icon}</View>
+      {icon ? <View style={styles.icon}>{icon}</View> : null}
       <View style={styles.texts}>
         <Text style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
@@ -51,6 +52,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 16,
+  },
+  rowWithoutIcon: {
+    minHeight: 56,
+    paddingVertical: 6,
+    paddingLeft: 16,
   },
   pressed: {
     opacity: 0.85,

@@ -20,19 +20,22 @@ export class ApiError extends Error {
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
 // Hace un pedido a la API de Wedshare con la sesión del usuario.
+// body puede ser un objeto (se manda como JSON) o un FormData (por ejemplo, para subir una foto).
 export async function apiRequest<T>(method: Method, path: string, body?: unknown): Promise<T> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
+  const isForm = body instanceof FormData;
 
   let response: Response;
   try {
     response = await fetch(`${apiUrl}${path}`, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        // Con FormData, fetch arma solo el Content-Type con su separador.
+        ...(isForm ? {} : { 'Content-Type': 'application/json' }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
     throw new ApiError('No pudimos conectarnos con el servidor. Revisá tu conexión e intentá de nuevo.');

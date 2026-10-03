@@ -8,6 +8,23 @@ export type Event = {
   calendarSync: boolean;
   playlistEnabled: boolean;
   giftsEnabled: boolean;
+  // Personalizar → Portada.
+  coupleNames: string | null;
+  welcomeMessage: string | null;
+  // Direcciones de las fotos de portada, en orden (hasta 3).
+  coverPhotoUrls: string[];
+  coverWithoutPhotos: boolean;
+  // Personalizar → Eventos. Fecha en formato AAAA-MM-DD.
+  rsvpDeadline: string | null;
+  dressCode: string | null;
 };
 
-export type NewEvent = Omit<Event, 'id'>;
+export type NewEvent = Pick<
+  Event,
+  'name' | 'date' | 'venue' | 'calendarSync' | 'playlistEnabled' | 'giftsEnabled'
+>;
+
+// Lo que se puede cambiar desde Personalizar. Las fotos se suben aparte.
+export type EventChanges = Partial<Omit<Event, 'id' | 'coverPhotoUrls'>>;
+
+export const MAX_COVER_PHOTOS = 3;

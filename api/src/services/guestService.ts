@@ -24,12 +24,6 @@ function newInviteToken() {
 
 const withGuests = { guests: { orderBy: { createdAt: 'asc' } } } as const;
 
-// Devuelve el id del evento del usuario, o null si todavía no lo creó.
-export async function getOwnerEventId(ownerId: string) {
-  const event = await prisma.event.findUnique({ where: { ownerId }, select: { id: true } });
-  return event?.id ?? null;
-}
-
 export async function listGuestGroups(eventId: string) {
   const groups = await prisma.guestGroup.findMany({
     where: { eventId },

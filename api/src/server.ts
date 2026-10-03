@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
 import express, { NextFunction, Request, Response } from 'express';
+import multer from 'multer';
 
 import { router } from './routes';
 
@@ -17,6 +18,15 @@ app.use((_req: Request, res: Response) => {
 
 // Errores inesperados: se muestran en la consola y la app recibe un mensaje genérico.
 app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
+  if (error instanceof multer.MulterError) {
+    res.status(400).json({
+      error:
+        error.code === 'LIMIT_FILE_SIZE'
+          ? 'La foto es muy pesada. Elegí una de hasta 5 MB.'
+          : 'No pudimos recibir la foto. Probá con otra.',
+    });
+    return;
+  }
   console.error(error);
   res.status(500).json({ error: 'Algo salió mal. Intentá de nuevo en unos minutos.' });
 });

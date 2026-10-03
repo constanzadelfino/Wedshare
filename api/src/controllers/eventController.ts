@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 
+import { isUuid } from '../lib/uuid';
 import { EventInput, validateEventInput } from '../models/event';
 import * as eventService from '../services/eventService';
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const NOT_FOUND = { error: 'No encontramos ese evento.' };
 
 type IdParams = { id: string };
+type PhotoParams = { id: string; index: string };
 
 // GET /events
 export async function list(_req: Request, res: Response) {
@@ -15,7 +16,7 @@ export async function list(_req: Request, res: Response) {
 
 // GET /events/:id
 export async function show(req: Request<IdParams>, res: Response) {
-  const event = UUID_PATTERN.test(req.params.id)
+  const event = isUuid(req.params.id)
     ? await eventService.getEvent(res.locals.userId, req.params.id)
     : null;
   if (!event) {
@@ -37,7 +38,10 @@ export async function create(req: Request, res: Response) {
     return;
   }
   // Al crear, la validación ya exige nombre, fecha y lugar.
-  const event = await eventService.createEvent(res.locals.userId, result.data as EventInput);
+  const event = await eventService.createEvent(
+    res.locals.userId,
+    result.data as Pick<EventInput, 'name' | 'date' | 'venue'>,
+  );
   res.status(201).json(event);
 }
 
@@ -48,24 +52,91 @@ export async function update(req: Request<IdParams>, res: Response) {
     res.status(400).json({ error: result.error });
     return;
   }
-  const event = UUID_PATTERN.test(req.params.id)
-    ? await eventService.updateEvent(res.locals.userId, req.params.id, result.data)
+  const current = isUuid(req.params.id)
+    ? await eventService.getEvent(res.locals.userId, req.params.id)
     : null;
-  if (!event) {
+  if (!current) {
     res.status(404).json(NOT_FOUND);
     return;
   }
-  res.json(event);
+
+  // La fecha límite para confirmar tiene que ser antes del casamiento.
+  const date = result.data.date ?? current.date;
+  const deadline = result.data.rsvpDeadline !== undefined ? result.data.rsvpDeadline : current.rsvpDeadline;
+  if (deadline && deadline > date) {
+    res.status(400).json({ error: 'La fecha límite para confirmar tiene que ser antes del casamiento.' });
+    return;
+  }
+
+  res.json(await eventService.updateEvent(res.locals.userId, req.params.id, result.data));
 }
 
 // DELETE /events/:id
 export async function remove(req: Request<IdParams>, res: Response) {
   const deleted =
-    UUID_PATTERN.test(req.params.id) &&
-    (await eventService.deleteEvent(res.locals.userId, req.params.id));
+    isUuid(req.params.id) && (await eventService.deleteEvent(res.locals.userId, req.params.id));
   if (!deleted) {
     res.status(404).json(NOT_FOUND);
     return;
   }
   res.status(204).end();
+}
+
+// Responde los errores esperables de las fotos con su mensaje; los demás siguen de largo.
+function handleCoverPhotoError(error: unknown, res: Response) {
+  if (error instanceof eventService.CoverPhotoError) {
+    res.status(error.status).json({ error: error.message });
+    return true;
+  }
+  return false;
+}
+
+// POST /events/:id/cover-photos (formulario con el archivo en el campo "photo")
+export async function addCoverPhoto(req: Request<IdParams>, res: Response) {
+  if (!req.file) {
+    res.status(400).json({ error: 'Elegí una foto para subir.' });
+    return;
+  }
+  if (!isUuid(req.params.id)) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  try {
+    const event = await eventService.addCoverPhoto(
+      res.locals.userId,
+      req.params.id,
+      req.file.buffer,
+      req.file.mimetype,
+    );
+    if (!event) {
+      res.status(404).json(NOT_FOUND);
+      return;
+    }
+    res.status(201).json(event);
+  } catch (error) {
+    if (!handleCoverPhotoError(error, res)) {
+      throw error;
+    }
+  }
+}
+
+// DELETE /events/:id/cover-photos/:index
+export async function removeCoverPhoto(req: Request<PhotoParams>, res: Response) {
+  const index = Number(req.params.index);
+  if (!isUuid(req.params.id) || !Number.isInteger(index) || index < 0) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  try {
+    const event = await eventService.removeCoverPhoto(res.locals.userId, req.params.id, index);
+    if (!event) {
+      res.status(404).json(NOT_FOUND);
+      return;
+    }
+    res.json(event);
+  } catch (error) {
+    if (!handleCoverPhotoError(error, res)) {
+      throw error;
+    }
+  }
 }

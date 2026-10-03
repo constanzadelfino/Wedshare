@@ -9,14 +9,37 @@ export type EventData = {
   calendarSync: boolean;
   playlistEnabled: boolean;
   giftsEnabled: boolean;
+  // Personalizar → Portada.
+  coupleNames: string | null;
+  welcomeMessage: string | null;
+  // Direcciones públicas de las fotos de portada, en orden.
+  coverPhotoUrls: string[];
+  coverWithoutPhotos: boolean;
+  // Personalizar → Eventos. Fecha en formato AAAA-MM-DD.
+  rsvpDeadline: string | null;
+  dressCode: string | null;
 };
 
-export type EventInput = Omit<EventData, 'id'>;
+// Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
+export type EventInput = Omit<EventData, 'id' | 'coverPhotoUrls'>;
+
+export const MAX_COVER_PHOTOS = 3;
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const BOOLEAN_FIELDS = ['calendarSync', 'playlistEnabled', 'giftsEnabled'] as const;
+const BOOLEAN_FIELDS = [
+  'calendarSync',
+  'playlistEnabled',
+  'giftsEnabled',
+  'coverWithoutPhotos',
+] as const;
+// Textos opcionales con su largo máximo. Vacío equivale a no tenerlo (null).
+const OPTIONAL_TEXT_FIELDS = {
+  coupleNames: { max: 80, label: 'Los nombres' },
+  welcomeMessage: { max: 600, label: 'El mensaje de bienvenida' },
+  dressCode: { max: 200, label: 'El dress code' },
+} as const;
 
-function isValidDate(value: string) {
+export function isValidDate(value: string) {
   if (!DATE_PATTERN.test(value)) {
     return false;
   }
@@ -63,6 +86,31 @@ export function validateEventInput(body: unknown, partial: boolean): ValidationR
       return { error: `El campo ${field} tiene que ser verdadero o falso.` };
     }
     data[field] = value;
+  }
+
+  for (const [field, { max, label }] of Object.entries(OPTIONAL_TEXT_FIELDS)) {
+    const value = input[field];
+    if (value === undefined) {
+      continue;
+    }
+    if (value !== null && typeof value !== 'string') {
+      return { error: `${label} tiene que ser un texto.` };
+    }
+    const text = value?.trim() || null;
+    if (text && text.length > max) {
+      return { error: `${label} puede tener hasta ${max} caracteres.` };
+    }
+    data[field as keyof typeof OPTIONAL_TEXT_FIELDS] = text;
+  }
+
+  if (input.rsvpDeadline !== undefined) {
+    if (input.rsvpDeadline === null || input.rsvpDeadline === '') {
+      data.rsvpDeadline = null;
+    } else if (typeof input.rsvpDeadline !== 'string' || !isValidDate(input.rsvpDeadline)) {
+      return { error: 'Revisá la fecha límite: tiene que tener el formato AAAA-MM-DD.' };
+    } else {
+      data.rsvpDeadline = input.rsvpDeadline;
+    }
   }
 
   return { data };
