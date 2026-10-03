@@ -1,18 +1,18 @@
 import { router } from 'expo-router';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
-import { Button } from '../../components/Button';
-import { FormError } from '../../components/FormError';
-import { Logo } from '../../components/Logo';
-import { Screen } from '../../components/Screen';
-import { useAuth } from '../../context/AuthContext';
-import { useEvents } from '../../controllers/useEvents';
-import { useSignOut } from '../../controllers/useSignOut';
-import { colors } from '../../theme/colors';
-import { fonts, text } from '../../theme/typography';
-import { isoDateToDisplay } from '../../utils/date';
+import { Button } from '../../../components/Button';
+import { FormError } from '../../../components/FormError';
+import { Logo } from '../../../components/Logo';
+import { Screen } from '../../../components/Screen';
+import { useAuth } from '../../../context/AuthContext';
+import { useEvents } from '../../../controllers/useEvents';
+import { useSignOut } from '../../../controllers/useSignOut';
+import { colors } from '../../../theme/colors';
+import { fonts, text } from '../../../theme/typography';
+import { isoDateToDisplay } from '../../../utils/date';
 
-// Inicio provisorio para probar el ingreso y los eventos. Se reemplaza por la pantalla 03 del diseño.
+// Inicio provisorio para probar el ingreso y el evento. Se reemplaza por la pantalla 03 del diseño.
 export default function InicioScreen() {
   const { user } = useAuth();
   const { loading, error, handleSignOut } = useSignOut();
@@ -35,14 +35,14 @@ export default function InicioScreen() {
 
       <View style={styles.events}>
         <Text style={styles.sectionTitle} accessibilityRole="header">
-          Tus eventos
+          Tu evento
         </Text>
         {events.loading ? (
           <ActivityIndicator color={colors.accent} />
         ) : events.error ? (
           <FormError message={events.error} />
         ) : events.events.length === 0 ? (
-          <Text style={text.body}>Todavía no creaste ningún evento.</Text>
+          <Text style={text.body}>Todavía no creaste tu evento.</Text>
         ) : (
           events.events.map((event) => (
             <View key={event.id} style={styles.card}>
@@ -53,7 +53,10 @@ export default function InicioScreen() {
             </View>
           ))
         )}
-        <Button title="Crear evento" onPress={() => router.push('/crear-evento')} />
+        {/* Cada cuenta tiene un solo casamiento: el botón se muestra solo si todavía no lo creó. */}
+        {!events.loading && !events.error && events.events.length === 0 ? (
+          <Button title="Crear evento" onPress={() => router.push('/crear-evento')} />
+        ) : null}
       </View>
 
       <FormError message={error} />

@@ -13,8 +13,8 @@ datasource db {
 // Un casamiento. Lo crean los novios desde la app.
 model Event {
   id              String   @id @default(uuid()) @db.Uuid
-  // Usuario de Supabase Auth que creó el evento.
-  ownerId         String   @map("owner_id") @db.Uuid
+  // Usuario de Supabase Auth que creó el evento. Cada cuenta tiene un solo casamiento.
+  ownerId         String   @unique @map("owner_id") @db.Uuid
   name            String
   // Solo la fecha, sin hora.
   date            DateTime @db.Date
@@ -28,6 +28,49 @@ model Event {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  @@index([ownerId])
+  guestGroups GuestGroup[]
+
   @@map("events")
+}
+
+// Una familia o grupo de invitados. Recibe un link único y confirma una sola vez.
+// Si alguien va solo, es un grupo de una persona.
+model GuestGroup {
+  id          String   @id @default(uuid()) @db.Uuid
+  eventId     String   @map("event_id") @db.Uuid
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  // Ej: "Familia Pérez".
+  name        String
+  // WhatsApp para mandarles el link. Opcional.
+  phone       String?
+  // Parte del link de la invitación. Es secreto: quien lo tiene ve la invitación del grupo.
+  inviteToken String   @unique @map("invite_token")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  guests Guest[]
+
+  @@index([eventId])
+  @@map("guest_groups")
+}
+
+// Respuesta de cada persona a la invitación.
+enum GuestStatus {
+  pending
+  confirmed
+  declined
+}
+
+// Una persona invitada, dentro de un grupo.
+model Guest {
+  id        String      @id @default(uuid()) @db.Uuid
+  groupId   String      @map("group_id") @db.Uuid
+  group     GuestGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name      String
+  status    GuestStatus @default(pending)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@index([groupId])
+  @@map("guests")
 }

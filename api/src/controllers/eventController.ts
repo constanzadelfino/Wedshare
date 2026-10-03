@@ -32,6 +32,10 @@ export async function create(req: Request, res: Response) {
     res.status(400).json({ error: result.error });
     return;
   }
+  if (await eventService.hasEvent(res.locals.userId)) {
+    res.status(409).json({ error: 'Ya creaste tu evento. Cada cuenta tiene un solo casamiento.' });
+    return;
+  }
   // Al crear, la validación ya exige nombre, fecha y lugar.
   const event = await eventService.createEvent(res.locals.userId, result.data as EventInput);
   res.status(201).json(event);

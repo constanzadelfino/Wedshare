@@ -31,6 +31,11 @@ export async function getEvent(ownerId: string, id: string) {
   return event ? toEventData(event) : null;
 }
 
+// Cada cuenta tiene un solo casamiento.
+export async function hasEvent(ownerId: string) {
+  return (await prisma.event.count({ where: { ownerId } })) > 0;
+}
+
 export async function createEvent(ownerId: string, input: EventInput) {
   const event = await prisma.event.create({
     data: { ...input, ownerId, date: toDbDate(input.date) },

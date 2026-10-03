@@ -36,6 +36,15 @@ export const text = {
     fontStyle: 'normal',
     fontSize: 16,
   },
+  // Títulos de sección en mayúsculas espaciadas, como "Módulos opcionales".
+  sectionLabel: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 13,
+    letterSpacing: 1.56,
+    textTransform: 'uppercase',
+    color: colors.accentText,
+  },
   screenTitle: {
     fontFamily: fonts.semiBold,
     fontStyle: 'normal',

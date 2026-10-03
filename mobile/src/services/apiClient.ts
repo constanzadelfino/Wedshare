@@ -7,7 +7,15 @@ if (!apiUrl) {
 }
 
 // Error con un mensaje ya listo para mostrar en pantalla.
-export class ApiError extends Error {}
+// status es el código de la respuesta (por ejemplo 404), o 0 si no hubo conexión.
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status = 0,
+  ) {
+    super(message);
+  }
+}
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -37,7 +45,10 @@ export async function apiRequest<T>(method: Method, path: string, body?: unknown
   const json = await response.json().catch(() => null);
   if (!response.ok) {
     // La API manda los errores en español en el campo "error".
-    throw new ApiError(json?.error ?? 'Algo salió mal. Intentá de nuevo en unos minutos.');
+    throw new ApiError(
+      json?.error ?? 'Algo salió mal. Intentá de nuevo en unos minutos.',
+      response.status,
+    );
   }
   return json as T;
 }

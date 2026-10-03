@@ -11,7 +11,7 @@ import { TextField } from '../../components/TextField';
 import { ToggleRow } from '../../components/ToggleRow';
 import { useCreateEvent } from '../../controllers/useCreateEvent';
 import { colors } from '../../theme/colors';
-import { fonts } from '../../theme/typography';
+import { text } from '../../theme/typography';
 
 const iconProps = {
   width: 22,
@@ -93,7 +93,7 @@ export default function CrearEventoScreen() {
       />
 
       <View style={styles.modules}>
-        <Text style={styles.sectionLabel}>Módulos opcionales</Text>
+        <Text style={text.sectionLabel}>Módulos opcionales</Text>
         <ToggleRow
           title="Playlist del DJ"
           value={form.playlistEnabled}
@@ -128,14 +128,6 @@ const styles = StyleSheet.create({
   },
   modules: {
     gap: 8,
-  },
-  sectionLabel: {
-    fontFamily: fonts.bold,
-    fontStyle: 'normal',
-    fontSize: 13,
-    letterSpacing: 1.56,
-    textTransform: 'uppercase',
-    color: colors.accentText,
   },
   footer: {
     width: '100%',

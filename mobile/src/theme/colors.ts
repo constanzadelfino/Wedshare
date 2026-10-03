@@ -13,6 +13,13 @@ export const colors = {
   // Fondo de los íconos en las filas con interruptor y riel del interruptor apagado.
   iconBackground: '#EADFC9',
   switchOff: '#CDBE9E',
+  // Etiquetas de estado de los invitados: fondo y texto.
+  confirmedBackground: '#E6EDD8',
+  confirmedText: '#3F5223',
+  pendingBackground: '#F3E6C8',
+  pendingText: '#7A5A12',
+  declinedBackground: '#F1DDD8',
+  declinedText: '#8A3B2E',
   // No está en el diseño: tono para mensajes de error, con buen contraste sobre el crema.
   error: '#A33A2B',
 } as const;
