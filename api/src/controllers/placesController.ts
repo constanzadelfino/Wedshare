@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 
 import * as placesService from '../services/placesService';
 
-const SESSION_TOKEN_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+// Google acepta identificadores de sesión de hasta 36 caracteres.
+const SESSION_TOKEN_PATTERN = /^[A-Za-z0-9_-]{8,36}$/;
 const PLACE_ID_PATTERN = /^[A-Za-z0-9_-]{10,300}$/;
 
 function handlePlacesError(error: unknown, res: Response) {
