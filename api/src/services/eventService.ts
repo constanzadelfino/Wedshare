@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 
 import { Event } from '../../generated/prisma/client';
 import { prisma } from '../lib/prisma';
@@ -37,6 +37,11 @@ function toEventData(event: Event): EventData {
     coverWithoutPhotos: event.coverWithoutPhotos,
     rsvpDeadline: event.rsvpDeadline ? fromDbDate(event.rsvpDeadline) : null,
     dressCode: event.dressCode,
+    giftBank: event.giftBank,
+    giftHolder: event.giftHolder,
+    giftAlias: event.giftAlias,
+    giftCbu: event.giftCbu,
+    giftMailbox: event.giftMailbox,
   };
 }
 
@@ -86,6 +91,22 @@ export async function createEvent(
 export async function updateEvent(ownerId: string, id: string, input: Partial<EventInput>) {
   const { count } = await prisma.event.updateMany({ where: { id, ownerId }, data: toDbData(input) });
   return count ? getEvent(ownerId, id) : null;
+}
+
+// Token del link de vista previa. Se crea la primera vez que se pide y después no cambia.
+// Devuelve null si el evento no existe o es de otra persona.
+export async function getPreviewToken(ownerId: string, id: string) {
+  const event = await prisma.event.findFirst({ where: { id, ownerId }, select: { previewToken: true } });
+  if (!event) {
+    return null;
+  }
+  if (event.previewToken) {
+    return event.previewToken;
+  }
+  // Mismo formato que los links de los invitados: 16 bytes al azar, 22 caracteres.
+  const previewToken = randomBytes(16).toString('base64url');
+  await prisma.event.update({ where: { id }, data: { previewToken } });
+  return previewToken;
 }
 
 // Devuelve false si el evento no existe o es de otra persona.

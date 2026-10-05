@@ -22,3 +22,11 @@ export function normalizeForSearch(value: string) {
     .toLowerCase()
     .trim();
 }
+
+// Alias de una cuenta en Argentina: de 6 a 20 letras, números, puntos o guiones.
+export const BANK_ALIAS_PATTERN = /^[A-Za-z0-9.-]{6,20}$/;
+
+// Muestra solo el final del CBU: "CBU ···· 4821".
+export function maskCbu(cbu: string) {
+  return `CBU ···· ${cbu.slice(-4)}`;
+}

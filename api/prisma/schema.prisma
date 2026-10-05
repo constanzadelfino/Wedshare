@@ -38,22 +38,40 @@ model Event {
   rsvpDeadline DateTime? @map("rsvp_deadline") @db.Date
   dressCode    String?   @map("dress_code")
 
+  // Regalos: cuenta bancaria (la usan los regalos por transferencia) y buzón en el salón.
+  giftBank    String? @map("gift_bank")
+  giftHolder  String? @map("gift_holder")
+  giftAlias   String? @map("gift_alias")
+  giftCbu     String? @map("gift_cbu")
+  giftMailbox Boolean @default(false) @map("gift_mailbox")
+
+  // Link para que los novios vean su invitación con una familia de ejemplo.
+  // Es distinto de los links de los invitados y se crea la primera vez que se pide.
+  previewToken String? @unique @map("preview_token")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   guestGroups GuestGroup[]
   items       EventItem[]
+  gifts       Gift[]
 
   @@map("events")
 }
 
-// Cada parte del casamiento: civil, ceremonia, festejo u otra que agreguen los novios.
+// Tipo de cada parte del casamiento. Hay como máximo una de cada una por casamiento.
+enum EventItemKind {
+  party
+  ceremony
+  civil
+}
+
+// Cada parte del casamiento: festejo, ceremonia o civil. El nombre sale del tipo.
 model EventItem {
   id        String   @id @default(uuid()) @db.Uuid
   eventId   String   @map("event_id") @db.Uuid
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  // Ej: "Civil", "Ceremonia", "Festejo".
-  name      String
+  kind      EventItemKind
   date      DateTime @db.Date
   // Formato HH:MM, en horario de Argentina.
   time      String
@@ -66,7 +84,7 @@ model EventItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([eventId])
+  @@unique([eventId, kind])
   @@map("event_items")
 }
 
@@ -142,4 +160,46 @@ model EntryCheck {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("entry_checks")
+}
+
+// Cómo se hace el regalo: con un link de pago (por ejemplo, de Mercado Pago), con el link
+// de un producto o por transferencia a la cuenta bancaria del evento.
+enum GiftMethod {
+  payment
+  product
+  transfer
+}
+
+// Tipo de regalo. Cada uno tiene su ícono en la app y en la web; no se suben fotos.
+// savings: ahorro. honeymoon: luna de miel y viajes. experience: cenas, citas, spa, espectáculos.
+// home: cosas para la casa. baby: para el bebé. other: todo lo demás.
+enum GiftType {
+  savings
+  honeymoon
+  experience
+  home
+  baby
+  other
+}
+
+// Idea de regalo que cargan los novios. Wedshare no maneja el dinero: el invitado toca
+// "Regalar" y se abre el link, o ve la cuenta para transferir. Los novios marcan a mano
+// los que ya les regalaron.
+model Gift {
+  id        String       @id @default(uuid()) @db.Uuid
+  eventId   String       @map("event_id") @db.Uuid
+  event     Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name      String
+  // En pesos, sin centavos. Opcional.
+  price     Int?
+  type      GiftType     @default(other)
+  method    GiftMethod
+  // Link de pago o del producto. Vacío en los regalos por transferencia.
+  url       String?
+  given     Boolean      @default(false)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  @@index([eventId])
+  @@map("gifts")
 }

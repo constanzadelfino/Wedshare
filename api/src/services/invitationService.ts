@@ -4,6 +4,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../lib/prisma';
 import { getStorageClient, publicPhotoUrl } from '../lib/storage';
 import { InvitationData, isRsvpClosed, RsvpInput } from '../models/invitation';
+import { toGiftData } from './giftService';
 
 // Consultas de la web del invitado. No hay sesión: el grupo se busca por su invite_token,
 // y desde ahí solo se llega a su propio evento y su propia respuesta.
@@ -22,11 +23,63 @@ export class RsvpError extends Error {
   }
 }
 
+const eventInclude = {
+  items: { orderBy: [{ date: 'asc' }, { time: 'asc' }] },
+  gifts: { orderBy: { createdAt: 'asc' } },
+} satisfies Prisma.EventInclude;
+
 const invitationInclude = {
   guests: { orderBy: { createdAt: 'asc' } },
   rsvp: true,
-  event: { include: { items: { orderBy: [{ date: 'asc' }, { time: 'asc' }] } } },
+  event: { include: eventInclude },
 } satisfies Prisma.GuestGroupInclude;
+
+type EventWithDetails = Prisma.EventGetPayload<{ include: typeof eventInclude }>;
+
+// La parte de la invitación que es igual para todos los grupos del evento.
+function toInvitationEvent(event: EventWithDetails): InvitationData['event'] {
+  const storage = getStorageClient();
+  const rsvpDeadline = event.rsvpDeadline ? fromDbDate(event.rsvpDeadline) : null;
+  const hasBank = !!(event.giftBank || event.giftHolder || event.giftAlias || event.giftCbu);
+  const showGifts =
+    event.giftsEnabled && (hasBank || event.giftMailbox || event.gifts.length > 0);
+  return {
+    name: event.name,
+    coupleNames: event.coupleNames,
+    date: fromDbDate(event.date),
+    venue: event.venue,
+    welcomeMessage: event.welcomeMessage,
+    coverPhotoUrls: storage ? event.coverPhotos.map((path) => publicPhotoUrl(storage, path)) : [],
+    coverWithoutPhotos: event.coverWithoutPhotos,
+    rsvpDeadline,
+    rsvpClosed: isRsvpClosed(rsvpDeadline),
+    dressCode: event.dressCode,
+    items: event.items.map((item) => ({
+      id: item.id,
+      kind: item.kind,
+      date: fromDbDate(item.date),
+      time: item.time,
+      venueName: item.venueName,
+      address: item.address,
+      placeId: item.placeId,
+      latitude: item.latitude,
+      longitude: item.longitude,
+    })),
+    gifts: showGifts
+      ? {
+          bank: hasBank
+            ? { bank: event.giftBank, holder: event.giftHolder, alias: event.giftAlias, cbu: event.giftCbu }
+            : null,
+          mailbox: event.giftMailbox,
+          // Sin el id: el invitado no lo necesita.
+          ideas: event.gifts.map((gift) => {
+            const { id: _id, ...data } = toGiftData(gift);
+            return data;
+          }),
+        }
+      : null,
+  };
+}
 
 // Devuelve null si no hay ningún grupo con ese token.
 export async function getInvitation(inviteToken: string): Promise<InvitationData | null> {
@@ -38,11 +91,9 @@ export async function getInvitation(inviteToken: string): Promise<InvitationData
     return null;
   }
 
-  const { event } = group;
-  const storage = getStorageClient();
-  const rsvpDeadline = event.rsvpDeadline ? fromDbDate(event.rsvpDeadline) : null;
   const anyoneConfirmed = group.guests.some((guest) => guest.status === 'confirmed');
   return {
+    preview: false,
     group: {
       name: group.name,
       guests: group.guests.map((guest) => ({
@@ -55,30 +106,29 @@ export async function getInvitation(inviteToken: string): Promise<InvitationData
       // Si nadie asiste, el QR queda desactivado aunque el código siga guardado.
       entryCode: anyoneConfirmed ? group.entryCode : null,
     },
-    event: {
-      name: event.name,
-      coupleNames: event.coupleNames,
-      date: fromDbDate(event.date),
-      venue: event.venue,
-      welcomeMessage: event.welcomeMessage,
-      coverPhotoUrls: storage ? event.coverPhotos.map((path) => publicPhotoUrl(storage, path)) : [],
-      coverWithoutPhotos: event.coverWithoutPhotos,
-      rsvpDeadline,
-      rsvpClosed: isRsvpClosed(rsvpDeadline),
-      dressCode: event.dressCode,
-      items: event.items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        date: fromDbDate(item.date),
-        time: item.time,
-        venueName: item.venueName,
-        address: item.address,
-        placeId: item.placeId,
-        latitude: item.latitude,
-        longitude: item.longitude,
-      })),
-    },
+    event: toInvitationEvent(group.event),
   };
+}
+
+// Familia de ejemplo de la vista previa. Los ids son fijos y no existen en la base.
+const PREVIEW_GROUP: InvitationData['group'] = {
+  name: 'Familia Ejemplo',
+  guests: [
+    { id: '00000000-0000-4000-8000-000000000001', name: 'Persona de ejemplo 1', status: 'pending', dietary: null },
+    { id: '00000000-0000-4000-8000-000000000002', name: 'Persona de ejemplo 2', status: 'pending', dietary: null },
+  ],
+  rsvp: null,
+  entryCode: null,
+};
+
+// Vista previa para los novios: su invitación con una familia de ejemplo.
+// Devuelve null si no hay ningún evento con ese token.
+export async function getPreview(previewToken: string): Promise<InvitationData | null> {
+  const event = await prisma.event.findUnique({ where: { previewToken }, include: eventInclude });
+  if (!event) {
+    return null;
+  }
+  return { preview: true, group: PREVIEW_GROUP, event: toInvitationEvent(event) };
 }
 
 // Guarda la respuesta del grupo. "create" es la primera confirmación y "update" el cambio

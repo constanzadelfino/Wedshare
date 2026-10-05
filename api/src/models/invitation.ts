@@ -1,8 +1,12 @@
+import { EventItemKind } from './eventItem';
+import { GiftData } from './gift';
 import { GuestStatus } from './guest';
 
 // Lo que ve un invitado al abrir su link. Es público para quien tenga el token,
 // así que solo lleva lo que se muestra en la invitación: nada del dueño ni de otros grupos.
 export type InvitationData = {
+  // true en la vista previa de los novios: la familia es de ejemplo y no se puede confirmar.
+  preview: boolean;
   group: {
     name: string;
     guests: { id: string; name: string; status: GuestStatus; dietary: string | null }[];
@@ -30,7 +34,8 @@ export type InvitationData = {
     // Civil, ceremonia, festejo u otros, en orden cronológico.
     items: {
       id: string;
-      name: string;
+      // party (festejo), ceremony (ceremonia) o civil. La web pone el nombre y el ícono.
+      kind: EventItemKind;
       date: string;
       // Formato HH:MM, en horario de Argentina.
       time: string;
@@ -40,6 +45,13 @@ export type InvitationData = {
       latitude: number | null;
       longitude: number | null;
     }[];
+    // Sección Regalos. null si los novios la apagaron o no cargaron nada.
+    gifts: {
+      // null si no cargaron ningún dato de la cuenta.
+      bank: { bank: string | null; holder: string | null; alias: string | null; cbu: string | null } | null;
+      mailbox: boolean;
+      ideas: Omit<GiftData, 'id'>[];
+    } | null;
   };
 };
 

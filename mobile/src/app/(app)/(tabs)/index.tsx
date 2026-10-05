@@ -103,7 +103,7 @@ export default function InicioScreen() {
             <QuickAction
               title="Lista de regalos"
               description="Regalos y contribuciones"
-              comingSoon
+              onPress={() => router.push('/regalos')}
               icon={
                 <Svg {...quickActionIconProps}>
                   <Rect x={3} y={8} width={18} height={4} />

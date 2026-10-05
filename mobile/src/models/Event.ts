@@ -17,6 +17,13 @@ export type Event = {
   // Personalizar → Eventos. Fecha en formato AAAA-MM-DD.
   rsvpDeadline: string | null;
   dressCode: string | null;
+  // Regalos: cuenta bancaria (la usan los regalos por transferencia) y buzón en el salón.
+  giftBank: string | null;
+  giftHolder: string | null;
+  giftAlias: string | null;
+  // 22 números (CBU o CVU).
+  giftCbu: string | null;
+  giftMailbox: boolean;
 };
 
 export type NewEvent = Pick<

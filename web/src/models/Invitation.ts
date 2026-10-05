@@ -10,10 +10,18 @@ export type InvitationGuest = {
   dietary: string | null;
 };
 
+// party: festejo. ceremony: ceremonia. civil: civil.
+export type EventItemKind = 'party' | 'ceremony' | 'civil';
+
+export const EVENT_ITEM_LABELS: Record<EventItemKind, string> = {
+  party: 'Festejo',
+  ceremony: 'Ceremonia',
+  civil: 'Civil',
+};
+
 export type InvitationItem = {
   id: string;
-  // Civil, ceremonia, festejo u otro.
-  name: string;
+  kind: EventItemKind;
   // Formato AAAA-MM-DD.
   date: string;
   // Formato HH:MM, en horario de Argentina.
@@ -25,7 +33,40 @@ export type InvitationItem = {
   longitude: number | null;
 };
 
+export type GiftType = 'savings' | 'honeymoon' | 'experience' | 'home' | 'baby' | 'other';
+
+export type GiftIdea = {
+  name: string;
+  // Elige el ícono del regalo.
+  type: GiftType;
+  // En pesos, sin centavos.
+  price: number | null;
+  // payment: link de pago (por ejemplo, de Mercado Pago). product: link de un producto.
+  // transfer: transferencia a la cuenta bancaria de los novios.
+  method: 'payment' | 'product' | 'transfer';
+  // null en los regalos por transferencia.
+  url: string | null;
+  // Los novios lo marcan cuando ya se lo regalaron.
+  given: boolean;
+};
+
+export type BankAccount = {
+  bank: string | null;
+  holder: string | null;
+  alias: string | null;
+  cbu: string | null;
+};
+
+export type InvitationGifts = {
+  // null si los novios no cargaron la cuenta.
+  bank: BankAccount | null;
+  mailbox: boolean;
+  ideas: GiftIdea[];
+};
+
 export type Invitation = {
+  // true en la vista previa de los novios: la familia es de ejemplo y no se puede confirmar.
+  preview: boolean;
   group: {
     name: string;
     guests: InvitationGuest[];
@@ -49,6 +90,8 @@ export type Invitation = {
     rsvpClosed: boolean;
     dressCode: string | null;
     items: InvitationItem[];
+    // Sección Regalos. null si los novios la apagaron o no cargaron nada.
+    gifts: InvitationGifts | null;
   };
 };
 

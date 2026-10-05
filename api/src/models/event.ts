@@ -18,6 +18,13 @@ export type EventData = {
   // Personalizar → Eventos. Fecha en formato AAAA-MM-DD.
   rsvpDeadline: string | null;
   dressCode: string | null;
+  // Regalos: cuenta bancaria (la usan los regalos por transferencia) y buzón.
+  giftBank: string | null;
+  giftHolder: string | null;
+  giftAlias: string | null;
+  // 22 números (CBU o CVU).
+  giftCbu: string | null;
+  giftMailbox: boolean;
 };
 
 // Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
@@ -31,13 +38,19 @@ const BOOLEAN_FIELDS = [
   'playlistEnabled',
   'giftsEnabled',
   'coverWithoutPhotos',
+  'giftMailbox',
 ] as const;
 // Textos opcionales con su largo máximo. Vacío equivale a no tenerlo (null).
 const OPTIONAL_TEXT_FIELDS = {
   coupleNames: { max: 80, label: 'Los nombres' },
   welcomeMessage: { max: 600, label: 'El mensaje de bienvenida' },
   dressCode: { max: 200, label: 'El dress code' },
+  giftBank: { max: 80, label: 'El banco' },
+  giftHolder: { max: 80, label: 'El titular' },
 } as const;
+
+// Alias de una cuenta en Argentina: de 6 a 20 letras, números, puntos o guiones.
+const ALIAS_PATTERN = /^[A-Za-z0-9.-]{6,20}$/;
 
 export function isValidDate(value: string) {
   if (!DATE_PATTERN.test(value)) {
@@ -101,6 +114,22 @@ export function validateEventInput(body: unknown, partial: boolean): ValidationR
       return { error: `${label} puede tener hasta ${max} caracteres.` };
     }
     data[field as keyof typeof OPTIONAL_TEXT_FIELDS] = text;
+  }
+
+  if (input.giftAlias !== undefined) {
+    const alias = typeof input.giftAlias === 'string' ? input.giftAlias.trim() : input.giftAlias;
+    if (alias !== null && alias !== '' && (typeof alias !== 'string' || !ALIAS_PATTERN.test(alias))) {
+      return { error: 'Revisá el alias: tiene de 6 a 20 letras, números, puntos o guiones.' };
+    }
+    data.giftAlias = alias || null;
+  }
+
+  if (input.giftCbu !== undefined) {
+    const cbu = typeof input.giftCbu === 'string' ? input.giftCbu.replace(/\s/g, '') : input.giftCbu;
+    if (cbu !== null && cbu !== '' && (typeof cbu !== 'string' || !/^\d{22}$/.test(cbu))) {
+      return { error: 'Revisá el CBU: tiene que tener 22 números.' };
+    }
+    data.giftCbu = cbu || null;
   }
 
   if (input.rsvpDeadline !== undefined) {
