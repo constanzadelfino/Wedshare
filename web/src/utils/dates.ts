@@ -15,6 +15,15 @@ export function dayAndMonth(date: string) {
   return `${day} de ${MONTHS[month - 1]}`;
 }
 
+const WEEKDAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+// "Viernes 19 de marzo"
+export function weekdayAndDate(date: string) {
+  const { year, month, day } = parts(date);
+  const weekday = WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+  return `${weekday} ${dayAndMonth(date)}`;
+}
+
 export function dayNumber(date: string) {
   return String(parts(date).day).padStart(2, '0');
 }

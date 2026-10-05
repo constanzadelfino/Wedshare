@@ -53,7 +53,7 @@ export function InvitationView({ inviteToken, invitation, onChange }: Props) {
       <CoverSection invitation={invitation} />
       {event.welcomeMessage && <WelcomeSection message={event.welcomeMessage} />}
       <DateSection date={event.date} start={start} calendarUrl={calendarUrl} />
-      {event.items.length > 0 && <EventsSection items={event.items} />}
+      {event.items.length > 0 && <EventsSection items={event.items} weddingDate={event.date} />}
       {event.dressCode && <DressCodeSection dressCode={event.dressCode} />}
       {event.story && <StorySection story={event.story} />}
       {event.spotifyPlaylistUrl && <PlaylistSection url={event.spotifyPlaylistUrl} />}

@@ -1,45 +1,51 @@
 import { EventItemIcon } from '../components/EventItemIcon';
-import { PinIcon } from '../components/Icons';
 import { SectionTitle } from '../components/SectionTitle';
 import { EVENT_ITEM_LABELS, InvitationItem } from '../models/Invitation';
-import { dayNumber, monthName } from '../utils/dates';
+import { weekdayAndDate } from '../utils/dates';
 import { directionsUrl } from '../utils/maps';
 
-// Dónde y cuándo: una tarjeta por cada parte del casamiento, en el orden en que suceden
-// (la API las manda ordenadas por fecha y hora).
-export function EventsSection({ items }: { items: InvitationItem[] }) {
+type Props = {
+  items: InvitationItem[];
+  // Fecha del casamiento: los eventos de otro día (por ejemplo, el civil) muestran su fecha.
+  weddingDate: string;
+};
+
+// Dónde y cuándo, como línea de tiempo (opción elegida por Constanza): el día contado en orden,
+// unido por una línea dorada con el ícono de cada momento. La API manda los eventos ordenados.
+export function EventsSection({ items, weddingDate }: Props) {
   return (
     <section id="eventos" className="sec bg-soft">
-      <div className="wrap">
+      <div className="wrap max-w-[560px]">
         <SectionTitle eyebrow="Dónde y cuándo" title="Te esperamos" />
-        <div className="h-5" />
-        <div className="cards">
+        <div className="h-6" />
+        <ol className="relative m-0 flex list-none flex-col gap-9 p-0 pl-[68px]">
+          {/* La línea que une los momentos, por detrás de los círculos. */}
+          <span className="absolute top-2 bottom-2 left-[27px] w-px bg-gold" aria-hidden="true" />
           {items.map((item) => (
-            <article key={item.id} className="card flex flex-col items-center gap-3.5 px-[22px] py-[26px] text-center">
-              <span className="text-gold">
-                <EventItemIcon kind={item.kind} />
+            <li key={item.id} className="relative">
+              <span className="absolute top-0 -left-[68px] flex h-14 w-14 items-center justify-center rounded-full border border-gold bg-soft text-gold">
+                <EventItemIcon kind={item.kind} size={30} />
               </span>
-              <h3 className="m-0 font-display text-[28px] font-normal">{EVENT_ITEM_LABELS[item.kind]}</h3>
-              <div className="flex w-full items-center justify-center gap-4 border-y border-line px-2 py-3.5">
-                <span className="font-display text-[46px] leading-none font-normal">{dayNumber(item.date)}</span>
-                <span className="flex flex-col text-left">
-                  <span className="text-[14px] font-bold tracking-[0.16em] text-accent uppercase">
-                    {monthName(item.date)}
-                  </span>
-                  <span className="text-[17px] font-semibold">{item.time} horas</span>
-                </span>
-              </div>
-              <div>
-                <div className="text-[18px] font-bold">{item.venueName}</div>
-                <div className="text-[15px] text-muted">{item.address}</div>
-              </div>
-              <a href={directionsUrl(item)} target="_blank" rel="noreferrer" className="btn btn-outline">
-                <PinIcon />
+              {item.date !== weddingDate && (
+                <div className="text-[14px] font-semibold text-muted">{weekdayAndDate(item.date)}</div>
+              )}
+              <div className="font-display text-[30px] leading-tight font-light">{item.time} h</div>
+              <h3 className="m-0 mt-0.5 text-[13px] font-bold tracking-[0.2em] text-accent uppercase">
+                {EVENT_ITEM_LABELS[item.kind]}
+              </h3>
+              <div className="mt-2.5 text-[17px] font-bold">{item.venueName}</div>
+              <div className="text-[15px] leading-[1.5] text-muted">{item.address}</div>
+              <a
+                href={directionsUrl(item)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-flex min-h-11 items-center font-bold text-accent underline underline-offset-[3px]"
+              >
                 Cómo llegar
               </a>
-            </article>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );
