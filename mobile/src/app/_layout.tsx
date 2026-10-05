@@ -3,6 +3,7 @@ import {
   Figtree_500Medium,
   Figtree_600SemiBold,
   Figtree_700Bold,
+  Figtree_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/figtree';
 import { Stack } from 'expo-router';
@@ -31,6 +32,7 @@ function RootNavigator() {
     Figtree_500Medium,
     Figtree_600SemiBold,
     Figtree_700Bold,
+    Figtree_800ExtraBold,
   });
   const isReady = (fontsLoaded || !!fontError) && !isLoading;
 

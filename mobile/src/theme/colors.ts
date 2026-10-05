@@ -10,6 +10,8 @@ export const colors = {
   placeholder: '#7A6A54',
   darkBrown: '#3A2C1B',
   lightGold: '#E2C58A',
+  // Textos claros de la tarjeta de cuenta regresiva ("Faltan", "días").
+  countdownText: '#E8DCC4',
   // Fondo de los íconos en las filas con interruptor y riel del interruptor apagado.
   iconBackground: '#EADFC9',
   switchOff: '#CDBE9E',

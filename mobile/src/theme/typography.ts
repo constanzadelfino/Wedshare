@@ -8,6 +8,7 @@ export const fonts = {
   medium: 'Figtree_500Medium',
   semiBold: 'Figtree_600SemiBold',
   bold: 'Figtree_700Bold',
+  extraBold: 'Figtree_800ExtraBold',
 } as const;
 
 // Nunca cursiva: todos los estilos fijan fontStyle en normal.

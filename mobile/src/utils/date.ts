@@ -53,3 +53,20 @@ export function isoToTime(iso: string) {
   const pad = (value: number) => String(value).padStart(2, '0');
   return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
+
+const MONTHS = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+// Convierte AAAA-MM-DD a "20 de marzo de 2027".
+export function isoDateToLongDisplay(iso: string) {
+  const [year, month, day] = iso.split('-');
+  return `${Number(day)} de ${MONTHS[Number(month) - 1]} de ${year}`;
+}
+
+// Días que faltan desde hoy (según el celular) hasta una fecha AAAA-MM-DD. Negativo si ya pasó.
+export function daysUntil(iso: string) {
+  const toUtcDay = (value: string) => Date.parse(`${value}T00:00:00Z`);
+  return Math.round((toUtcDay(iso) - toUtcDay(todayIso())) / 86_400_000);
+}
