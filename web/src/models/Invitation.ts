@@ -97,8 +97,6 @@ export type Invitation = {
     albumPhotoUrls: string[];
     // Frase final de los novios, en el cierre.
     closingPhrase: string | null;
-    // Música de fondo: el id de una de las canciones de Wedshare (utils/music.ts), o null.
-    backgroundMusic: string | null;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: InvitationGifts | null;
   };

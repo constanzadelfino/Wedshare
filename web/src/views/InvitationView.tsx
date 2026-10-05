@@ -21,8 +21,6 @@ type Props = {
   inviteToken: string;
   invitation: Invitation;
   onChange: (invitation: Invitation) => void;
-  // Canción de fondo y su crédito, para el cierre.
-  musicCredit: { title: string; credit: string | null } | null;
 };
 
 // Lleva la pantalla a una sección, después de que se cierre lo que esté encima.
@@ -30,7 +28,7 @@ function scrollToSection(id: string) {
   requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }));
 }
 
-export function InvitationView({ inviteToken, invitation, onChange, musicCredit }: Props) {
+export function InvitationView({ inviteToken, invitation, onChange }: Props) {
   const { event } = invitation;
   const rsvp = useRsvp(inviteToken, invitation, onChange);
 
@@ -63,7 +61,7 @@ export function InvitationView({ inviteToken, invitation, onChange, musicCredit 
       {event.gifts && <GiftsSection gifts={event.gifts} />}
       <RsvpSection invitation={invitation} rsvp={rsvp} />
       <QrSection invitation={invitation} onChangeAnswer={changeAnswer} />
-      <ClosingFooter phrase={event.closingPhrase} music={musicCredit} />
+      <ClosingFooter phrase={event.closingPhrase} />
       {rsvp.showThanks && (
         <ThanksScreen
           invitation={invitation}

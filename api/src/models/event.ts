@@ -34,16 +34,10 @@ export type EventData = {
   storyPhotoUrl: string | null;
   albumPhotoUrls: string[];
   closingPhrase: string | null;
-  // Música de fondo: el id de una de las canciones de Wedshare, o null.
-  backgroundMusic: BackgroundMusic | null;
 };
 
 // Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
 export type EventInput = Omit<EventData, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls'>;
-
-// Canciones de fondo que ofrece Wedshare (grabaciones libres, ver web/public/music/CREDITOS.md).
-export const BACKGROUND_MUSIC = ['canon', 'clair-de-lune'] as const;
-export type BackgroundMusic = (typeof BACKGROUND_MUSIC)[number];
 
 export const MAX_COVER_PHOTOS = 3;
 export const MAX_ALBUM_PHOTOS = 8;
@@ -173,13 +167,6 @@ export function validateEventInput(body: unknown, partial: boolean): ValidationR
       }
       data.spotifyPlaylistUrl = url;
     }
-  }
-
-  if (input.backgroundMusic !== undefined) {
-    if (input.backgroundMusic !== null && !BACKGROUND_MUSIC.includes(input.backgroundMusic as BackgroundMusic)) {
-      return { error: 'Elegí una de las canciones de la lista.' };
-    }
-    data.backgroundMusic = input.backgroundMusic as BackgroundMusic | null;
   }
 
   if (input.rsvpDeadline !== undefined) {

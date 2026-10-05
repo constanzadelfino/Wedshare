@@ -1,4 +1,4 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/Button';
 import { CoverPhotos } from '../../components/CoverPhotos';
@@ -8,12 +8,11 @@ import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
 import { useInvitationPreview } from '../../controllers/useInvitationPreview';
 import { useStory } from '../../controllers/useStory';
-import { BACKGROUND_MUSIC_OPTIONS, MAX_ALBUM_PHOTOS } from '../../models/Event';
+import { MAX_ALBUM_PHOTOS } from '../../models/Event';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
 
-// Historia, álbum y música (pantalla 14 del diseño). La música se elige de la lista de Wedshare
-// (grabaciones libres); no se suben canciones propias.
+// Historia y álbum (pantalla 14 del diseño): foto y texto de la historia, álbum y frase final.
 export default function HistoriaScreen() {
   const form = useStory();
   const preview = useInvitationPreview(form.event?.id);
@@ -44,7 +43,7 @@ export default function HistoriaScreen() {
         ) : null
       }
     >
-      <ScreenHeader title="Historia, álbum y música" showLogo={false} />
+      <ScreenHeader title="Historia y álbum" showLogo={false} />
 
       {form.loading ? (
         <ActivityIndicator color={colors.accent} />
@@ -98,34 +97,6 @@ export default function HistoriaScreen() {
           />
           <FormError message={form.photoError} />
 
-          <Text style={[text.sectionLabel, styles.section]}>Música de fondo</Text>
-          <Text style={styles.musicHint}>
-            Suena cuando tus invitados abren el sobre, con un botón para pausarla.
-          </Text>
-          <View style={styles.musicList} accessibilityRole="radiogroup">
-            {[{ value: null, title: 'Sin música', detail: '' }, ...BACKGROUND_MUSIC_OPTIONS].map((option) => {
-              const selected = form.backgroundMusic === option.value;
-              return (
-                <Pressable
-                  key={option.value ?? 'none'}
-                  onPress={() => form.setBackgroundMusic(option.value)}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected }}
-                  accessibilityLabel={option.detail ? `${option.title}, ${option.detail}` : option.title}
-                  style={({ pressed }) => [styles.musicOption, selected && styles.musicOptionSelected, pressed && styles.pressed]}
-                >
-                  <View style={[styles.radio, selected && styles.radioSelected]}>
-                    {selected ? <View style={styles.radioDot} /> : null}
-                  </View>
-                  <View style={styles.musicTexts}>
-                    <Text style={styles.musicTitle}>{option.title}</Text>
-                    {option.detail ? <Text style={styles.musicDetail}>{option.detail}</Text> : null}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-
           <Text style={[text.sectionLabel, styles.section]}>Frase final</Text>
           <TextField
             label="Frase"
@@ -155,68 +126,6 @@ const styles = StyleSheet.create({
   },
   storyFields: {
     flex: 1,
-  },
-  musicHint: {
-    fontFamily: fonts.regular,
-    fontStyle: 'normal',
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  musicList: {
-    gap: 8,
-  },
-  musicOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    minHeight: 56,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-  },
-  musicOptionSelected: {
-    borderWidth: 2,
-    borderColor: colors.accent,
-    backgroundColor: colors.iconBackground,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: colors.switchOff,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioSelected: {
-    borderColor: colors.accent,
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.accent,
-  },
-  musicTexts: {
-    flex: 1,
-  },
-  musicTitle: {
-    fontFamily: fonts.semiBold,
-    fontStyle: 'normal',
-    fontSize: 15,
-    color: colors.text,
-  },
-  musicDetail: {
-    fontFamily: fonts.regular,
-    fontStyle: 'normal',
-    fontSize: 13,
-    color: colors.textSecondary,
   },
   saved: {
     ...text.link,

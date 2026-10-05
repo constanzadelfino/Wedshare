@@ -55,8 +55,6 @@ model Event {
   // Hasta 8 fotos, en orden.
   albumPhotos   String[] @default([]) @map("album_photos")
   closingPhrase String?  @map("closing_phrase")
-  // Música de fondo: una de las canciones de Wedshare (ver web/public/music), o null.
-  backgroundMusic String? @map("background_music")
 
   // Link para que los novios vean su invitación con una familia de ejemplo.
   // Es distinto de los links de los invitados y se crea la primera vez que se pide.

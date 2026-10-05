@@ -2,13 +2,7 @@ import { HeartLogo } from '../components/HeartLogo';
 import { Ornament } from '../components/Ornament';
 
 // Cierre de la invitación, con la frase final de los novios si la cargaron.
-export function ClosingFooter({
-  phrase,
-  music,
-}: {
-  phrase: string | null;
-  music: { title: string; credit: string | null } | null;
-}) {
+export function ClosingFooter({ phrase }: { phrase: string | null }) {
   return (
     <footer className="rounded-t-[44px] bg-dark pt-14 pb-9 text-bg">
       <div className="wrap flex flex-col items-center gap-[18px] text-center">
@@ -27,13 +21,6 @@ export function ClosingFooter({
             <span className="text-[18px] font-bold text-bg">Hecho con Wedshare</span>
           </span>
         </div>
-        {/* Las licencias CC BY y CC BY-SA piden nombrar al intérprete. */}
-        {music && (
-          <p className="m-0 text-[12px] leading-[1.5] text-mdark">
-            Música: {music.title}
-            {music.credit ? ` · ${music.credit}` : ' · Dominio público'}
-          </p>
-        )}
       </div>
     </footer>
   );

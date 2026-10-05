@@ -79,7 +79,7 @@ export default function InvitacionScreen() {
               }
             />
             <QuickAction
-              title="Historia, álbum y música"
+              title="Historia y álbum"
               description="Su historia, fotos y frase final"
               onPress={() => router.push('/historia')}
               icon={

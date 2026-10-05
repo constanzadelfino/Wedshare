@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { BackgroundMusic, Event, MAX_ALBUM_PHOTOS } from '../models/Event';
+import { Event, MAX_ALBUM_PHOTOS } from '../models/Event';
 import { ApiError } from '../services/apiClient';
 import {
   getMyEvent,
@@ -19,7 +19,7 @@ function errorMessage(error: unknown, fallback: string) {
 // Qué foto se está subiendo o quitando: la de la historia o una del álbum (por posición).
 type PhotoBusy = { kind: 'story' } | { kind: 'album'; index: number } | null;
 
-// Lógica de "Historia, álbum y música" (pantalla 14 del diseño). Los textos se guardan con
+// Lógica de "Historia y álbum" (pantalla 14 del diseño). Los textos se guardan con
 // Guardar; las fotos se suben y se quitan al momento, como en la Portada.
 export function useStory() {
   const [event, setEvent] = useState<Event | null>(null);
@@ -28,7 +28,6 @@ export function useStory() {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyText, setStoryText] = useState('');
   const [closingPhrase, setClosingPhrase] = useState('');
-  const [backgroundMusic, setBackgroundMusic] = useState<BackgroundMusic | null>(null);
   const [photoBusy, setPhotoBusy] = useState<PhotoBusy>(null);
   const [photoError, setPhotoError] = useState<string>();
   const [formError, setFormError] = useState<string>();
@@ -45,7 +44,6 @@ export function useStory() {
         setStoryTitle(myEvent.storyTitle ?? '');
         setStoryText(myEvent.storyText ?? '');
         setClosingPhrase(myEvent.closingPhrase ?? '');
-        setBackgroundMusic(myEvent.backgroundMusic);
       })
       .catch((error) => setLoadError(errorMessage(error, 'No pudimos cargar tu invitación.')))
       .finally(() => setLoading(false));
@@ -115,7 +113,6 @@ export function useStory() {
         storyTitle: storyTitle.trim() || null,
         storyText: storyText.trim() || null,
         closingPhrase: closingPhrase.trim() || null,
-        backgroundMusic,
       });
       setEvent(updated);
       setSaved(true);
@@ -136,8 +133,6 @@ export function useStory() {
     setStoryText: edit(setStoryText),
     closingPhrase,
     setClosingPhrase: edit(setClosingPhrase),
-    backgroundMusic,
-    setBackgroundMusic: edit(setBackgroundMusic),
     storyPhotoUrl: event?.storyPhotoUrl ?? null,
     albumPhotoUrls: event?.albumPhotoUrls ?? [],
     // Posición de la foto del álbum que se está subiendo o quitando.
