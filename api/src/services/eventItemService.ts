@@ -7,7 +7,7 @@ import { EventItemData, EventItemInput } from '../models/eventItem';
 function toEventItemData(item: EventItem): EventItemData {
   return {
     id: item.id,
-    name: item.name,
+    kind: item.kind,
     date: item.date.toISOString().slice(0, 10),
     time: item.time,
     venueName: item.venueName,

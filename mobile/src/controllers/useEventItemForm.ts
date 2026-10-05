@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { EVENT_ITEM_KINDS, EventItemKind } from '../models/EventItem';
 import { PlaceSuggestion } from '../models/Place';
 import { ApiError } from '../services/apiClient';
 import { createEventItem, deleteEventItem, listEventItems, updateEventItem } from '../services/eventItemService';
@@ -17,7 +18,7 @@ import {
 const SEARCH_DELAY_MS = 350;
 
 type FieldErrors = {
-  name?: string;
+  kind?: string;
   date?: string;
   time?: string;
   venueName?: string;
@@ -30,12 +31,15 @@ function errorMessage(error: unknown, fallback: string) {
   return error instanceof ApiError ? error.message : fallback;
 }
 
-// Lógica del formulario de un evento (civil, ceremonia, festejo...). Si recibe itemId, edita;
-// si no, crea uno nuevo. La dirección se autocompleta con Google Maps a través de la API.
+// Lógica del formulario de un evento (festejo, ceremonia o civil). Si recibe itemId, edita;
+// si no, crea uno nuevo. Hay como máximo uno de cada tipo.
+// La dirección se autocompleta con Google Maps a través de la API.
 export function useEventItemForm(itemId: string | undefined, onDone: () => void) {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string>();
-  const [name, setName] = useState('');
+  const [kind, setKind] = useState<EventItemKind | null>(null);
+  // Tipos que ya usan otros eventos del casamiento: no se pueden elegir.
+  const [usedKinds, setUsedKinds] = useState<EventItemKind[]>([]);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [venueName, setVenueName] = useState('');
@@ -54,29 +58,34 @@ export function useEventItemForm(itemId: string | undefined, onDone: () => void)
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Al editar, carga el evento; al crear, propone la fecha del casamiento.
+  // Carga los eventos para saber qué tipos están usados. Al editar, también el evento;
+  // al crear, propone la fecha del casamiento y el primer tipo libre.
   useEffect(() => {
-    const load = itemId
-      ? listEventItems().then((items) => {
-          const item = items.find((candidate) => candidate.id === itemId);
-          if (!item) {
-            throw new ApiError('No encontramos ese evento.', 404);
-          }
-          setName(item.name);
-          setDate(isoDateToDisplay(item.date));
-          setTime(item.time);
-          setVenueName(item.venueName);
-          setAddress(item.address);
-          if (item.placeId && item.latitude !== null && item.longitude !== null) {
-            setPlace({ placeId: item.placeId, latitude: item.latitude, longitude: item.longitude });
-          }
-        })
-      : getMyEvent().then((event) => {
+    Promise.all([listEventItems(), getMyEvent()])
+      .then(([items, event]) => {
+        const others = items.filter((candidate) => candidate.id !== itemId);
+        const used = others.map((candidate) => candidate.kind);
+        setUsedKinds(used);
+        if (!itemId) {
+          setKind(EVENT_ITEM_KINDS.find((option) => !used.includes(option.value))?.value ?? null);
           if (event) {
             setDate(isoDateToDisplay(event.date));
           }
-        });
-    load
+          return;
+        }
+        const item = items.find((candidate) => candidate.id === itemId);
+        if (!item) {
+          throw new ApiError('No encontramos ese evento.', 404);
+        }
+        setKind(item.kind);
+        setDate(isoDateToDisplay(item.date));
+        setTime(item.time);
+        setVenueName(item.venueName);
+        setAddress(item.address);
+        if (item.placeId && item.latitude !== null && item.longitude !== null) {
+          setPlace({ placeId: item.placeId, latitude: item.latitude, longitude: item.longitude });
+        }
+      })
       .catch((error) => setLoadError(errorMessage(error, 'No pudimos cargar el evento.')))
       .finally(() => setLoading(false));
   }, [itemId]);
@@ -129,13 +138,13 @@ export function useEventItemForm(itemId: string | undefined, onDone: () => void)
     sessionToken.current = newPlacesSessionToken();
   }
 
+  // Revisa los campos. Devuelve true si están bien.
   function validate() {
     const errors: FieldErrors = {};
-    if (!name.trim()) {
-      errors.name = 'Escribí el nombre del evento.';
+    if (!kind) {
+      errors.kind = 'Elegí si es el festejo, la ceremonia o el civil.';
     }
-    const isoDate = displayDateToIso(date);
-    if (!isoDate) {
+    if (!displayDateToIso(date)) {
       errors.date = date ? 'Revisá la fecha: tiene que ser DD/MM/AAAA.' : 'Escribí la fecha.';
     }
     if (!isValidTime(time)) {
@@ -148,18 +157,18 @@ export function useEventItemForm(itemId: string | undefined, onDone: () => void)
       errors.address = 'Escribí la dirección.';
     }
     setFieldErrors(errors);
-    return Object.keys(errors).length === 0 ? isoDate : null;
+    return Object.keys(errors).length === 0;
   }
 
   async function handleSave() {
     setFormError(undefined);
-    const isoDate = validate();
-    if (!isoDate) {
+    const isoDate = displayDateToIso(date);
+    if (!validate() || !isoDate || !kind) {
       return;
     }
     setSaving(true);
     const data = {
-      name: name.trim(),
+      kind,
       date: isoDate,
       time,
       venueName: venueName.trim(),
@@ -200,8 +209,11 @@ export function useEventItemForm(itemId: string | undefined, onDone: () => void)
     isEditing: !!itemId,
     loading,
     loadError,
-    name,
-    setName,
+    kind,
+    setKind,
+    usedKinds,
+    // Ya están los tres: no se puede agregar otro.
+    allKindsUsed: !itemId && usedKinds.length >= EVENT_ITEM_KINDS.length,
     date,
     setDate: (value: string) => setDate(formatDateInput(value)),
     time,

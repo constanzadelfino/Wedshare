@@ -1,22 +1,26 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { EventItem } from '../models/EventItem';
+import { EventItem, eventItemLabel } from '../models/EventItem';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/typography';
 import { isoDateToShortDisplay } from '../utils/date';
+import { EventItemIcon } from './EventItemIcon';
 
-// Tarjeta de un evento en Personalizar → Eventos: nombre, fecha y hora, y lugar. Al tocarla se edita.
+// Tarjeta de un evento en Personalizar → Eventos: ícono, tipo, fecha y hora, y lugar. Al tocarla se edita.
 export function EventItemCard({ item, onPress }: { item: EventItem; onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Editar ${item.name}`}
+      accessibilityLabel={`Editar ${eventItemLabel(item.kind)}`}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
+      <View style={styles.icon}>
+        <EventItemIcon kind={item.kind} color={colors.textSecondary} />
+      </View>
       <View style={styles.texts}>
-        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.name}>{eventItemLabel(item.kind)}</Text>
         <Text style={styles.detail}>
           {isoDateToShortDisplay(item.date)} · {item.time} horas
         </Text>
@@ -38,7 +42,7 @@ const styles = StyleSheet.create({
     gap: 12,
     minHeight: 76,
     paddingVertical: 10,
-    paddingLeft: 16,
+    paddingLeft: 10,
     paddingRight: 8,
     backgroundColor: colors.card,
     borderWidth: 1,
@@ -47,6 +51,14 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.85,
+  },
+  icon: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: colors.iconBackground,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   texts: {
     flex: 1,

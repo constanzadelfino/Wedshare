@@ -1,7 +1,21 @@
-// Cada parte del casamiento: civil, ceremonia, festejo u otra.
+// Tipo de cada parte del casamiento. Hay como máximo una de cada una por casamiento.
+export type EventItemKind = 'party' | 'ceremony' | 'civil';
+
+// En este orden se ofrecen al agregar (pedido de Constanza).
+export const EVENT_ITEM_KINDS: { value: EventItemKind; label: string }[] = [
+  { value: 'party', label: 'Festejo' },
+  { value: 'ceremony', label: 'Ceremonia' },
+  { value: 'civil', label: 'Civil' },
+];
+
+export function eventItemLabel(kind: EventItemKind) {
+  return EVENT_ITEM_KINDS.find((option) => option.value === kind)?.label ?? '';
+}
+
+// Cada parte del casamiento: festejo, ceremonia o civil.
 export type EventItem = {
   id: string;
-  name: string;
+  kind: EventItemKind;
   // Formato AAAA-MM-DD.
   date: string;
   // Formato HH:MM.
@@ -15,6 +29,3 @@ export type EventItem = {
 };
 
 export type EventItemInput = Omit<EventItem, 'id'>;
-
-// Nombres que se ofrecen como atajo al agregar un evento.
-export const SUGGESTED_EVENT_ITEM_NAMES = ['Civil', 'Ceremonia', 'Festejo'];

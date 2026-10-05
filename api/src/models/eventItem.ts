@@ -1,9 +1,13 @@
 import { isValidDate } from './event';
 
-// Cada parte del casamiento (civil, ceremonia, festejo u otra), como la manda y la recibe la app.
+// Tipo de cada parte del casamiento. Hay como máximo una de cada una por casamiento.
+export const EVENT_ITEM_KINDS = ['party', 'ceremony', 'civil'] as const;
+export type EventItemKind = (typeof EVENT_ITEM_KINDS)[number];
+
+// Cada parte del casamiento (festejo, ceremonia o civil), como la manda y la recibe la app.
 export type EventItemData = {
   id: string;
-  name: string;
+  kind: EventItemKind;
   // Formato AAAA-MM-DD.
   date: string;
   // Formato HH:MM.
@@ -21,7 +25,6 @@ export type EventItemInput = Omit<EventItemData, 'id'>;
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const REQUIRED_TEXT_FIELDS = {
-  name: 'Escribí el nombre del evento (por ejemplo, Civil).',
   venueName: 'Escribí el nombre del lugar.',
   address: 'Escribí la dirección.',
 } as const;
@@ -36,6 +39,13 @@ export function validateEventItemInput(body: unknown, partial: boolean): Validat
   }
   const input = body as Record<string, unknown>;
   const data: Partial<EventItemInput> = {};
+
+  if (input.kind !== undefined || !partial) {
+    if (!EVENT_ITEM_KINDS.includes(input.kind as EventItemKind)) {
+      return { error: 'Elegí si es el festejo, la ceremonia o el civil.' };
+    }
+    data.kind = input.kind as EventItemKind;
+  }
 
   for (const [field, message] of Object.entries(REQUIRED_TEXT_FIELDS)) {
     const value = input[field];

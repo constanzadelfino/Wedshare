@@ -1,10 +1,12 @@
+import { EventItemIcon } from '../components/EventItemIcon';
 import { PinIcon } from '../components/Icons';
 import { SectionTitle } from '../components/SectionTitle';
-import { InvitationItem } from '../models/Invitation';
+import { EVENT_ITEM_LABELS, InvitationItem } from '../models/Invitation';
 import { dayNumber, monthName } from '../utils/dates';
 import { directionsUrl } from '../utils/maps';
 
-// Dónde y cuándo: una tarjeta por cada parte del casamiento (civil, ceremonia, festejo...).
+// Dónde y cuándo: una tarjeta por cada parte del casamiento, en el orden en que suceden
+// (la API las manda ordenadas por fecha y hora).
 export function EventsSection({ items }: { items: InvitationItem[] }) {
   return (
     <section id="eventos" className="sec bg-soft">
@@ -14,7 +16,10 @@ export function EventsSection({ items }: { items: InvitationItem[] }) {
         <div className="cards">
           {items.map((item) => (
             <article key={item.id} className="card flex flex-col items-center gap-3.5 px-[22px] py-[26px] text-center">
-              <h3 className="m-0 font-display text-[28px] font-normal">{item.name}</h3>
+              <span className="text-gold">
+                <EventItemIcon kind={item.kind} />
+              </span>
+              <h3 className="m-0 font-display text-[28px] font-normal">{EVENT_ITEM_LABELS[item.kind]}</h3>
               <div className="flex w-full items-center justify-center gap-4 border-y border-line px-2 py-3.5">
                 <span className="font-display text-[46px] leading-none font-normal">{dayNumber(item.date)}</span>
                 <span className="flex flex-col text-left">
