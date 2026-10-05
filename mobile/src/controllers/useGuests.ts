@@ -56,6 +56,18 @@ export function useGuests() {
     }, []),
   );
 
+  // Cuántas personas hay en cada estado (sin tener en cuenta la búsqueda), para los filtros.
+  const counts = useMemo(() => {
+    const result: Record<GuestFilter, number> = { all: 0, confirmed: 0, pending: 0, declined: 0 };
+    for (const group of groups) {
+      for (const guest of group.guests) {
+        result.all += 1;
+        result[guest.status] += 1;
+      }
+    }
+    return result;
+  }, [groups]);
+
   // Grupos que coinciden con la búsqueda y el filtro. Si el nombre del grupo coincide,
   // se muestran todas sus personas; si no, solo las que coinciden.
   const visibleGroups = useMemo(() => {
@@ -76,6 +88,7 @@ export function useGuests() {
   return {
     groups,
     visibleGroups,
+    counts,
     loading,
     error,
     noEvent,

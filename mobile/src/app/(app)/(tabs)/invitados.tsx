@@ -72,7 +72,14 @@ export default function InvitadosScreen() {
             onChangeText={guests.setSearch}
             placeholder="Buscar invitado"
           />
-          <FilterChips options={FILTERS} value={guests.filter} onChange={guests.setFilter} />
+          <FilterChips
+            options={FILTERS.map((option) => ({
+              ...option,
+              label: `${option.label} ${guests.counts[option.value]}`,
+            }))}
+            value={guests.filter}
+            onChange={guests.setFilter}
+          />
           {guests.visibleGroups.length === 0 ? (
             <Text style={text.body}>No hay invitados que coincidan con la búsqueda.</Text>
           ) : (
