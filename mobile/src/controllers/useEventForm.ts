@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { Event } from '../models/Event';
 import { ApiError } from '../services/apiClient';
-import { createEvent } from '../services/eventService';
-import { displayDateToIso, formatDateInput, todayIso } from '../utils/date';
+import { createEvent, getMyEvent, updateEvent } from '../services/eventService';
+import { displayDateToIso, formatDateInput, isoDateToDisplay, todayIso } from '../utils/date';
 
 type FieldErrors = {
   name?: string;
@@ -10,9 +11,13 @@ type FieldErrors = {
   venue?: string;
 };
 
-// Lógica de la pantalla Crear evento: datos del formulario, validación y envío.
-// onCreated se llama cuando el evento quedó guardado.
-export function useCreateEvent(onCreated: () => void) {
+// Lógica de la pantalla Crear evento, que también sirve para editar los datos principales del
+// casamiento (editing): formulario, validación y envío. onDone se llama cuando quedó guardado.
+export function useEventForm(editing: boolean, onDone: () => void) {
+  // Al editar, el evento que se carga; mientras tanto el formulario espera.
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loadingEvent, setLoadingEvent] = useState(editing);
+  const [loadError, setLoadError] = useState<string>();
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [venue, setVenue] = useState('');
@@ -24,6 +29,29 @@ export function useCreateEvent(onCreated: () => void) {
   const [formError, setFormError] = useState<string>();
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!editing) {
+      return;
+    }
+    getMyEvent()
+      .then((myEvent) => {
+        if (!myEvent) {
+          throw new ApiError('Primero creá tu evento.', 404);
+        }
+        setEvent(myEvent);
+        setName(myEvent.name);
+        setDate(isoDateToDisplay(myEvent.date));
+        setVenue(myEvent.venue);
+        setCalendarSync(myEvent.calendarSync);
+        setPlaylistEnabled(myEvent.playlistEnabled);
+        setGiftsEnabled(myEvent.giftsEnabled);
+      })
+      .catch((error) =>
+        setLoadError(error instanceof ApiError ? error.message : 'No pudimos cargar tu casamiento.'),
+      )
+      .finally(() => setLoadingEvent(false));
+  }, [editing]);
+
   function validate() {
     const errors: FieldErrors = {};
     if (!name.trim()) {
@@ -34,7 +62,8 @@ export function useCreateEvent(onCreated: () => void) {
       errors.date = 'Escribí la fecha.';
     } else if (!isoDate) {
       errors.date = 'Revisá la fecha: tiene que ser DD/MM/AAAA.';
-    } else if (isoDate < todayIso()) {
+    } else if (isoDate < todayIso() && isoDate !== event?.date) {
+      // Al editar, se puede dejar la fecha que ya tenía aunque haya pasado.
       errors.date = 'La fecha ya pasó. Elegí una fecha futura.';
     }
     if (!venue.trim()) {
@@ -44,7 +73,7 @@ export function useCreateEvent(onCreated: () => void) {
     return Object.keys(errors).length === 0 ? isoDate : null;
   }
 
-  async function handleCreate() {
+  async function handleSave() {
     setFormError(undefined);
     const isoDate = validate();
     if (!isoDate) {
@@ -53,15 +82,20 @@ export function useCreateEvent(onCreated: () => void) {
 
     setLoading(true);
     try {
-      await createEvent({
+      const data = {
         name: name.trim(),
         date: isoDate,
         venue: venue.trim(),
         calendarSync,
         playlistEnabled,
         giftsEnabled,
-      });
-      onCreated();
+      };
+      if (event) {
+        await updateEvent(event.id, data);
+      } else {
+        await createEvent(data);
+      }
+      onDone();
     } catch (error) {
       setFormError(
         error instanceof ApiError ? error.message : 'Algo salió mal. Intentá de nuevo en unos minutos.',
@@ -71,6 +105,8 @@ export function useCreateEvent(onCreated: () => void) {
   }
 
   return {
+    loadingEvent,
+    loadError,
     name,
     setName,
     date,
@@ -86,6 +122,6 @@ export function useCreateEvent(onCreated: () => void) {
     fieldErrors,
     formError,
     loading,
-    handleCreate,
+    handleSave,
   };
 }
