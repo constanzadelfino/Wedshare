@@ -52,8 +52,26 @@ function QrIcon({ color }: IconProps) {
   );
 }
 
-// Barra de pestañas de abajo. Por ahora Inicio, Invitados y QR;
-// Playlist y Perfil se suman cuando existan esas pantallas.
+function InvitationIcon({ color }: IconProps) {
+  return (
+    <Svg {...iconSvgProps(color)}>
+      <Rect x={2} y={4} width={20} height={16} rx={2} />
+      <Path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </Svg>
+  );
+}
+
+function ProfileIcon({ color }: IconProps) {
+  return (
+    <Svg {...iconSvgProps(color)}>
+      <Path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <Circle cx={12} cy={7} r={4} />
+    </Svg>
+  );
+}
+
+// Barra de pestañas de abajo: Inicio, Invitados, QR, Invitación y Perfil. Invitación ocupa el
+// lugar que el diseño le daba a Playlist, que ahora está adentro (pedido de Constanza).
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(16, insets.bottom);
@@ -98,6 +116,14 @@ export default function TabsLayout() {
             router.push('/escanear');
           },
         }}
+      />
+      <Tabs.Screen
+        name="invitacion"
+        options={{ title: 'Invitación', tabBarIcon: ({ color }) => <InvitationIcon color={color} /> }}
+      />
+      <Tabs.Screen
+        name="perfil"
+        options={{ title: 'Perfil', tabBarIcon: ({ color }) => <ProfileIcon color={color} /> }}
       />
     </Tabs>
   );

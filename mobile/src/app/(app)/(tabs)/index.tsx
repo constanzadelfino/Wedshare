@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { Button } from '../../../components/Button';
@@ -8,7 +8,7 @@ import { Logo } from '../../../components/Logo';
 import { QuickAction, quickActionIconProps } from '../../../components/QuickAction';
 import { Screen } from '../../../components/Screen';
 import { GuestCounts, useHome } from '../../../controllers/useHome';
-import { useSignOut } from '../../../controllers/useSignOut';
+import { useInvitationPreview } from '../../../controllers/useInvitationPreview';
 import { colors } from '../../../theme/colors';
 import { fonts, text } from '../../../theme/typography';
 import { isoDateToLongDisplay } from '../../../utils/date';
@@ -16,31 +16,10 @@ import { isoDateToLongDisplay } from '../../../utils/date';
 // Inicio (pantalla 03 del diseño): cuenta regresiva, confirmaciones y accesos rápidos.
 export default function InicioScreen() {
   const home = useHome();
-  const signOut = useSignOut();
+  const preview = useInvitationPreview(home.event?.id);
 
   return (
-    <Screen
-      topSpacing={64}
-      gap={16}
-      footer={
-        <View style={styles.footer}>
-          <FormError message={signOut.error} />
-          {/* No está en el diseño: va acá hasta que exista la pantalla de Perfil. */}
-          <Pressable
-            onPress={signOut.handleSignOut}
-            disabled={signOut.loading}
-            accessibilityRole="button"
-            style={styles.signOut}
-          >
-            {signOut.loading ? (
-              <ActivityIndicator color={colors.accent} />
-            ) : (
-              <Text style={text.link}>Cerrar sesión</Text>
-            )}
-          </Pressable>
-        </View>
-      }
-    >
+    <Screen topSpacing={64} gap={16}>
       {home.loading ? (
         <ActivityIndicator color={colors.accent} />
       ) : home.error ? (
@@ -76,41 +55,20 @@ export default function InicioScreen() {
               }
               onPress={() => router.push('/escanear')}
             />
-            {/* No está en el diseño: hoy es la única forma de llegar a Personalizar. */}
+            {/* No está en el diseño: la vista previa, también a mano desde la pestaña Invitación.
+                Regalos, Playlist y Personalizar ahora están en esa pestaña. */}
             <QuickAction
-              title="Personalizar invitación"
-              description="Portada, fotos y eventos"
+              title="Ver mi invitación"
+              description="Así la ven tus invitados"
+              onPress={preview.openPreview}
               icon={
                 <Svg {...quickActionIconProps}>
-                  <Path d="M12 20h9" />
-                  <Path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" />
-                </Svg>
-              }
-              onPress={() => router.push('/personalizar')}
-            />
-            <QuickAction
-              title="Playlist"
-              description="Tu playlist de Spotify"
-              onPress={() => router.push('/playlist')}
-              icon={
-                <Svg {...quickActionIconProps}>
-                  <Path d="M9 18V5l12-2v13" />
-                  <Circle cx={6} cy={18} r={3} />
-                  <Circle cx={18} cy={16} r={3} />
+                  <Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+                  <Circle cx={12} cy={12} r={3} />
                 </Svg>
               }
             />
-            <QuickAction
-              title="Lista de regalos"
-              description="Regalos y contribuciones"
-              onPress={() => router.push('/regalos')}
-              icon={
-                <Svg {...quickActionIconProps}>
-                  <Rect x={3} y={8} width={18} height={4} />
-                  <Path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5" />
-                </Svg>
-              }
-            />
+            <FormError message={preview.error} />
           </View>
         </>
       )}
@@ -294,15 +252,5 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: 10,
-  },
-  footer: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  signOut: {
-    minHeight: 44,
-    minWidth: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
@@ -28,7 +28,9 @@ const TABS: { value: Tab; label: string }[] = [
 ];
 
 export default function PersonalizarScreen() {
-  const [tab, setTab] = useState<Tab>('cover');
+  // Desde la pestaña Invitación se abre directo en Portada (?tab=cover) o Eventos (?tab=events).
+  const initialTab = useLocalSearchParams<{ tab?: string }>().tab === 'events' ? 'events' : 'cover';
+  const [tab, setTab] = useState<Tab>(initialTab);
   const form = usePersonalize();
   const items = useEventItems();
   const preview = useInvitationPreview(form.event?.id);
