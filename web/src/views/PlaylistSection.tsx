@@ -1,6 +1,8 @@
 import { SectionTitle } from '../components/SectionTitle';
 
 // Reproductor de Spotify a partir del link de la playlist (con o sin parámetros al final).
+// El color del reproductor lo toma Spotify de la portada de la playlist: por eso Wedshare les
+// ofrece a los novios portadas con los colores de la plantilla.
 function embedUrl(url: string) {
   const id = /\/playlist\/([A-Za-z0-9]+)/.exec(url)?.[1];
   return id ? `https://open.spotify.com/embed/playlist/${id}` : null;

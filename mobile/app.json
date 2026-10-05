@@ -27,6 +27,13 @@
       "expo-font",
       "expo-splash-screen",
       [
+        "expo-media-library",
+        {
+          "photosPermission": "Wedshare usa tus fotos para la portada de la invitación.",
+          "savePhotosPermission": "Wedshare guarda en tus fotos la portada para tu playlist."
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Wedshare usa tus fotos para la portada de la invitación."

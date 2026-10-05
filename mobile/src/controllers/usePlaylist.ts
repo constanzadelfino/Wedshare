@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
 
 import { Event } from '../models/Event';
 import { ApiError } from '../services/apiClient';
 import { getMyEvent, updateEvent } from '../services/eventService';
+import { saveCoverToPhotos } from '../services/coverSaver';
 import { openLink } from '../services/shareService';
+
+// Ayuda de Spotify para cambiar la portada de una playlist.
+const SPOTIFY_COVER_HELP = 'https://support.spotify.com/ar/article/add-playlist-cover/';
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof ApiError ? error.message : fallback;
@@ -19,6 +24,10 @@ export function usePlaylist() {
   const [error, setError] = useState<string>();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // La portada que se ve en pantalla: se guarda como imagen.
+  const coverRef = useRef<View>(null);
+  const [savingCover, setSavingCover] = useState(false);
+  const [coverMessage, setCoverMessage] = useState<string>();
 
   useEffect(() => {
     getMyEvent()
@@ -74,8 +83,30 @@ export function usePlaylist() {
     }
   }
 
+  async function saveCover() {
+    setCoverMessage(undefined);
+    setSavingCover(true);
+    try {
+      const ok = await saveCoverToPhotos(coverRef);
+      setCoverMessage(
+        ok
+          ? 'Listo, la portada está en tus fotos.'
+          : 'Para guardarla, permití que Wedshare guarde imágenes en tus fotos.',
+      );
+    } catch {
+      setCoverMessage('No pudimos guardar la portada. Intentá de nuevo.');
+    } finally {
+      setSavingCover(false);
+    }
+  }
+
   return {
     event,
+    coverRef,
+    savingCover,
+    coverMessage,
+    saveCover,
+    openCoverHelp: () => openLink(SPOTIFY_COVER_HELP).catch(() => undefined),
     loading,
     loadError,
     url,

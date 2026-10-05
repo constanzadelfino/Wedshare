@@ -4,6 +4,7 @@ import { colors } from './colors';
 
 // Con fuentes propias, el peso se elige por familia y no con fontWeight.
 export const fonts = {
+  light: 'Figtree_300Light',
   regular: 'Figtree_400Regular',
   medium: 'Figtree_500Medium',
   semiBold: 'Figtree_600SemiBold',

@@ -1,4 +1,5 @@
 import {
+  Figtree_300Light,
   Figtree_400Regular,
   Figtree_500Medium,
   Figtree_600SemiBold,
@@ -28,6 +29,7 @@ export default function RootLayout() {
 function RootNavigator() {
   const { user, isLoading } = useAuth();
   const [fontsLoaded, fontError] = useFonts({
+    Figtree_300Light,
     Figtree_400Regular,
     Figtree_500Medium,
     Figtree_600SemiBold,

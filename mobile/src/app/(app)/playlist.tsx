@@ -1,7 +1,8 @@
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
+import { PlaylistCover } from '../../components/PlaylistCover';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
@@ -84,6 +85,39 @@ export default function PlaylistScreen() {
           {event.spotifyPlaylistUrl ? (
             <Button title="Abrir en Spotify" variant="outline" onPress={playlist.openPlaylist} />
           ) : null}
+
+          <Text style={[text.sectionLabel, styles.section]}>Portada para tu playlist</Text>
+          {event.coupleNames ? (
+            <>
+              <Text style={styles.hint}>
+                Ponela como portada en Spotify: el reproductor de la invitación toma sus colores.
+              </Text>
+              <View style={styles.coverWrap}>
+                <PlaylistCover ref={playlist.coverRef} coupleNames={event.coupleNames} date={event.date} size={240} />
+              </View>
+              <Button title="Guardar imagen" loading={playlist.savingCover} onPress={playlist.saveCover} />
+              {playlist.coverMessage ? <Text style={styles.coverMessage}>{playlist.coverMessage}</Text> : null}
+              <View style={styles.note}>
+                <Text style={styles.noteTitle}>Para ponerla en Spotify:</Text>
+                {[
+                  'Guardá la imagen.',
+                  'En Spotify, abrí tu playlist y tocá los tres puntos, después Editar.',
+                  'Tocá la portada y elegí la imagen que guardaste.',
+                ].map((step, index) => (
+                  <Text key={step} style={styles.noteText}>
+                    {index + 1}. {step}
+                  </Text>
+                ))}
+                <Pressable onPress={playlist.openCoverHelp} accessibilityRole="link" style={styles.helpLink}>
+                  <Text style={text.link}>Ver la ayuda de Spotify</Text>
+                </Pressable>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.hint}>
+              Cargá sus nombres en Portada para armar una portada con sus iniciales.
+            </Text>
+          )}
         </>
       )}
     </Screen>
@@ -111,6 +145,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: colors.textSecondary,
+  },
+  section: {
+    marginTop: 12,
+  },
+  hint: {
+    fontFamily: fonts.regular,
+    fontStyle: 'normal',
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.textSecondary,
+  },
+  coverWrap: {
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  coverMessage: {
+    ...text.link,
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  helpLink: {
+    minHeight: 44,
+    justifyContent: 'center',
   },
   linkKind: {
     ...text.link,
