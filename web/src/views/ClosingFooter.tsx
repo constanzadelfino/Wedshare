@@ -1,12 +1,17 @@
 import { HeartLogo } from '../components/HeartLogo';
 import { Ornament } from '../components/Ornament';
 
-// Cierre de la invitación. La frase final de los novios se suma cuando exista en la app.
-export function ClosingFooter() {
+// Cierre de la invitación, con la frase final de los novios si la cargaron.
+export function ClosingFooter({ phrase }: { phrase: string | null }) {
   return (
     <footer className="rounded-t-[44px] bg-dark pt-14 pb-9 text-bg">
       <div className="wrap flex flex-col items-center gap-[18px] text-center">
         <Ornament />
+        {phrase && (
+          <p className="m-0 max-w-[480px] font-display text-[28px] leading-[1.35] font-normal text-bg">
+            “{phrase}”
+          </p>
+        )}
         <p className="m-0 max-w-[420px] text-[17px] leading-[1.55] text-mdark">
           Gracias por ser parte de este día tan especial.
         </p>

@@ -48,6 +48,11 @@ export type InvitationData = {
     // Playlist de Spotify de los novios, tal como la pegaron (puede ser la invitación a colaborar).
     // null si apagaron la sección o no cargaron el link.
     spotifyPlaylistUrl: string | null;
+    // Nuestra historia. null si no cargaron ni texto ni foto.
+    story: { title: string | null; text: string | null; photoUrl: string | null } | null;
+    // Direcciones públicas de las fotos del álbum, en orden.
+    albumPhotoUrls: string[];
+    closingPhrase: string | null;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: {
       // null si no cargaron ningún dato de la cuenta.

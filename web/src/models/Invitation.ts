@@ -92,6 +92,11 @@ export type Invitation = {
     items: InvitationItem[];
     // Link a la playlist de Spotify de los novios. null si no hay.
     spotifyPlaylistUrl: string | null;
+    // Nuestra historia. null si no cargaron ni texto ni foto.
+    story: { title: string | null; text: string | null; photoUrl: string | null } | null;
+    albumPhotoUrls: string[];
+    // Frase final de los novios, en el cierre.
+    closingPhrase: string | null;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: InvitationGifts | null;
   };

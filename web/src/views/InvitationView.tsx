@@ -2,6 +2,7 @@ import { useRsvp } from '../controllers/useRsvp';
 import { Invitation } from '../models/Invitation';
 import { argentinaTime } from '../utils/dates';
 import { googleCalendarUrl } from '../utils/calendar';
+import { AlbumSection } from './AlbumSection';
 import { ClosingFooter } from './ClosingFooter';
 import { CoverSection } from './CoverSection';
 import { DateSection } from './DateSection';
@@ -11,6 +12,7 @@ import { GiftsSection } from './GiftsSection';
 import { PlaylistSection } from './PlaylistSection';
 import { QrSection } from './QrSection';
 import { RsvpSection } from './RsvpSection';
+import { StorySection } from './StorySection';
 import { ThanksScreen } from './ThanksScreen';
 import { WelcomeSection } from './WelcomeSection';
 
@@ -53,11 +55,13 @@ export function InvitationView({ inviteToken, invitation, onChange }: Props) {
       <DateSection date={event.date} start={start} calendarUrl={calendarUrl} />
       {event.items.length > 0 && <EventsSection items={event.items} />}
       {event.dressCode && <DressCodeSection dressCode={event.dressCode} />}
+      {event.story && <StorySection story={event.story} />}
       {event.spotifyPlaylistUrl && <PlaylistSection url={event.spotifyPlaylistUrl} />}
+      {event.albumPhotoUrls.length > 0 && <AlbumSection photoUrls={event.albumPhotoUrls} />}
       {event.gifts && <GiftsSection gifts={event.gifts} />}
       <RsvpSection invitation={invitation} rsvp={rsvp} />
       <QrSection invitation={invitation} onChangeAnswer={changeAnswer} />
-      <ClosingFooter />
+      <ClosingFooter phrase={event.closingPhrase} />
       {rsvp.showThanks && (
         <ThanksScreen
           invitation={invitation}

@@ -39,3 +39,27 @@ export function uploadCoverPhoto(id: string, fileUri: string) {
 export function removeCoverPhoto(id: string, index: number) {
   return apiRequest<Event>('DELETE', `/events/${id}/cover-photos/${index}`);
 }
+
+function photoForm(fileUri: string) {
+  const form = new FormData();
+  form.append('photo', new File(fileUri));
+  return form;
+}
+
+// Pone (o reemplaza) la foto de Nuestra historia.
+export function uploadStoryPhoto(id: string, fileUri: string) {
+  return apiRequest<Event>('POST', `/events/${id}/story-photo`, photoForm(fileUri));
+}
+
+export function removeStoryPhoto(id: string) {
+  return apiRequest<Event>('DELETE', `/events/${id}/story-photo`);
+}
+
+// Suma una foto al final del álbum.
+export function uploadAlbumPhoto(id: string, fileUri: string) {
+  return apiRequest<Event>('POST', `/events/${id}/album-photos`, photoForm(fileUri));
+}
+
+export function removeAlbumPhoto(id: string, index: number) {
+  return apiRequest<Event>('DELETE', `/events/${id}/album-photos/${index}`);
+}

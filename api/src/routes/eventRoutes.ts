@@ -26,3 +26,7 @@ eventRoutes.delete('/:id', eventController.remove);
 eventRoutes.post('/:id/preview', eventController.preview);
 eventRoutes.post('/:id/cover-photos', photoUpload.single('photo'), eventController.addCoverPhoto);
 eventRoutes.delete('/:id/cover-photos/:index', eventController.removeCoverPhoto);
+eventRoutes.post('/:id/story-photo', photoUpload.single('photo'), eventController.setStoryPhoto);
+eventRoutes.delete('/:id/story-photo', eventController.removeStoryPhoto);
+eventRoutes.post('/:id/album-photos', photoUpload.single('photo'), eventController.addAlbumPhoto);
+eventRoutes.delete('/:id/album-photos/:index', eventController.removeAlbumPhoto);

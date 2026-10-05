@@ -152,3 +152,79 @@ export async function removeCoverPhoto(req: Request<PhotoParams>, res: Response)
     }
   }
 }
+
+// Corre una operación de fotos y responde el evento actualizado, 404 si no es del usuario
+// o el error esperable con su mensaje.
+async function respondWithPhotoChange(
+  res: Response,
+  run: () => Promise<Awaited<ReturnType<typeof eventService.getEvent>>>,
+  status = 200,
+) {
+  try {
+    const event = await run();
+    if (!event) {
+      res.status(404).json(NOT_FOUND);
+      return;
+    }
+    res.status(status).json(event);
+  } catch (error) {
+    if (!handleCoverPhotoError(error, res)) {
+      throw error;
+    }
+  }
+}
+
+// POST /events/:id/story-photo (formulario con el archivo en el campo "photo")
+export async function setStoryPhoto(req: Request<IdParams>, res: Response) {
+  if (!req.file) {
+    res.status(400).json({ error: 'Elegí una foto para subir.' });
+    return;
+  }
+  const file = req.file;
+  if (!isUuid(req.params.id)) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  await respondWithPhotoChange(res, () =>
+    eventService.setStoryPhoto(res.locals.userId, req.params.id, file.buffer, file.mimetype),
+  );
+}
+
+// DELETE /events/:id/story-photo
+export async function removeStoryPhoto(req: Request<IdParams>, res: Response) {
+  if (!isUuid(req.params.id)) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  await respondWithPhotoChange(res, () => eventService.removeStoryPhoto(res.locals.userId, req.params.id));
+}
+
+// POST /events/:id/album-photos (formulario con el archivo en el campo "photo")
+export async function addAlbumPhoto(req: Request<IdParams>, res: Response) {
+  if (!req.file) {
+    res.status(400).json({ error: 'Elegí una foto para subir.' });
+    return;
+  }
+  const file = req.file;
+  if (!isUuid(req.params.id)) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  await respondWithPhotoChange(
+    res,
+    () => eventService.addAlbumPhoto(res.locals.userId, req.params.id, file.buffer, file.mimetype),
+    201,
+  );
+}
+
+// DELETE /events/:id/album-photos/:index
+export async function removeAlbumPhoto(req: Request<PhotoParams>, res: Response) {
+  const index = Number(req.params.index);
+  if (!isUuid(req.params.id) || !Number.isInteger(index) || index < 0) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  await respondWithPhotoChange(res, () =>
+    eventService.removeAlbumPhoto(res.locals.userId, req.params.id, index),
+  );
+}

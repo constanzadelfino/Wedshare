@@ -55,6 +55,16 @@ function toInvitationEvent(event: EventWithDetails): InvitationData['event'] {
     rsvpClosed: isRsvpClosed(rsvpDeadline),
     dressCode: event.dressCode,
     spotifyPlaylistUrl: event.playlistEnabled ? event.spotifyPlaylistUrl : null,
+    story:
+      event.storyText || event.storyPhoto
+        ? {
+            title: event.storyTitle,
+            text: event.storyText,
+            photoUrl: storage && event.storyPhoto ? publicPhotoUrl(storage, event.storyPhoto) : null,
+          }
+        : null,
+    albumPhotoUrls: storage ? event.albumPhotos.map((path) => publicPhotoUrl(storage, path)) : [],
+    closingPhrase: event.closingPhrase,
     items: event.items.map((item) => ({
       id: item.id,
       kind: item.kind,

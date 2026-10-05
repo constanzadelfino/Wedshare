@@ -28,12 +28,19 @@ export type EventData = {
   // Link a una playlist de Spotify, tal como lo copiaron. Si es el de "Invitar colaboradores"
   // (trae pt=...), los invitados pueden sumar canciones.
   spotifyPlaylistUrl: string | null;
+  // Historia, álbum y frase final. Las fotos son direcciones públicas.
+  storyTitle: string | null;
+  storyText: string | null;
+  storyPhotoUrl: string | null;
+  albumPhotoUrls: string[];
+  closingPhrase: string | null;
 };
 
 // Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
-export type EventInput = Omit<EventData, 'id' | 'coverPhotoUrls'>;
+export type EventInput = Omit<EventData, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls'>;
 
 export const MAX_COVER_PHOTOS = 3;
+export const MAX_ALBUM_PHOTOS = 8;
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const BOOLEAN_FIELDS = [
@@ -50,6 +57,9 @@ const OPTIONAL_TEXT_FIELDS = {
   dressCode: { max: 200, label: 'El dress code' },
   giftBank: { max: 80, label: 'El banco' },
   giftHolder: { max: 80, label: 'El titular' },
+  storyTitle: { max: 80, label: 'El título de la historia' },
+  storyText: { max: 2000, label: 'La historia' },
+  closingPhrase: { max: 200, label: 'La frase final' },
 } as const;
 
 // Link de una playlist de Spotify, como lo da "Compartir → Copiar link" (puede traer

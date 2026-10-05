@@ -26,6 +26,12 @@ export type Event = {
   giftMailbox: boolean;
   // Link a una playlist de Spotify (la invitación muestra su reproductor).
   spotifyPlaylistUrl: string | null;
+  // Historia, álbum y frase final. Las fotos se suben aparte.
+  storyTitle: string | null;
+  storyText: string | null;
+  storyPhotoUrl: string | null;
+  albumPhotoUrls: string[];
+  closingPhrase: string | null;
 };
 
 export type NewEvent = Pick<
@@ -34,9 +40,10 @@ export type NewEvent = Pick<
 >;
 
 // Lo que se puede cambiar desde Personalizar. Las fotos se suben aparte.
-export type EventChanges = Partial<Omit<Event, 'id' | 'coverPhotoUrls'>>;
+export type EventChanges = Partial<Omit<Event, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls'>>;
 
 export const MAX_COVER_PHOTOS = 3;
+export const MAX_ALBUM_PHOTOS = 8;
 
 // El link de "Invitar colaboradores" de Spotify trae pt=...: con ese, los invitados pueden
 // sumar canciones a la playlist.

@@ -8,7 +8,7 @@ import {
   getStorageClient,
   publicPhotoUrl,
 } from '../lib/storage';
-import { EventData, EventInput, MAX_COVER_PHOTOS } from '../models/event';
+import { EventData, EventInput, MAX_ALBUM_PHOTOS, MAX_COVER_PHOTOS } from '../models/event';
 
 // Todas las consultas filtran por ownerId: cada pareja solo ve y toca sus eventos.
 
@@ -43,6 +43,11 @@ function toEventData(event: Event): EventData {
     giftCbu: event.giftCbu,
     giftMailbox: event.giftMailbox,
     spotifyPlaylistUrl: event.spotifyPlaylistUrl,
+    storyTitle: event.storyTitle,
+    storyText: event.storyText,
+    storyPhotoUrl: storage && event.storyPhoto ? publicPhotoUrl(storage, event.storyPhoto) : null,
+    albumPhotoUrls: storage ? event.albumPhotos.map((path) => publicPhotoUrl(storage, path)) : [],
+    closingPhrase: event.closingPhrase,
   };
 }
 
@@ -137,6 +142,27 @@ function requireStorage() {
   return storage;
 }
 
+// Sube una foto del evento a Storage y devuelve su ruta. Los nombres son al azar.
+async function storePhoto(eventId: string, file: Buffer, mimeType: string, folder = '') {
+  const storage = requireStorage();
+  await ensureCoverPhotosBucket(storage);
+  const extension = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${eventId}/${folder}${randomUUID()}.${extension}`;
+  const { error } = await storage.storage.from(COVER_PHOTOS_BUCKET).upload(path, file, { contentType: mimeType });
+  if (error) {
+    throw error;
+  }
+  return path;
+}
+
+// Borra fotos de Storage. Si falla, no se corta lo que se estaba haciendo.
+async function deleteStoredPhotos(paths: string[]) {
+  const storage = getStorageClient();
+  if (storage && paths.length > 0) {
+    await storage.storage.from(COVER_PHOTOS_BUCKET).remove(paths);
+  }
+}
+
 // Sube una foto de portada al final de la lista. Devuelve null si el evento no es del usuario.
 export async function addCoverPhoto(ownerId: string, id: string, file: Buffer, mimeType: string) {
   const event = await prisma.event.findFirst({ where: { id, ownerId } });
@@ -147,17 +173,7 @@ export async function addCoverPhoto(ownerId: string, id: string, file: Buffer, m
     throw new CoverPhotoError(`Podés subir hasta ${MAX_COVER_PHOTOS} fotos de portada.`, 400);
   }
 
-  const storage = requireStorage();
-  await ensureCoverPhotosBucket(storage);
-  const extension = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
-  const path = `${event.id}/${randomUUID()}.${extension}`;
-  const { error } = await storage.storage
-    .from(COVER_PHOTOS_BUCKET)
-    .upload(path, file, { contentType: mimeType });
-  if (error) {
-    throw error;
-  }
-
+  const path = await storePhoto(event.id, file, mimeType);
   const updated = await prisma.event.update({
     where: { id: event.id },
     data: { coverPhotos: { push: path } },
@@ -182,5 +198,63 @@ export async function removeCoverPhoto(ownerId: string, id: string, index: numbe
     where: { id: event.id },
     data: { coverPhotos: event.coverPhotos.filter((_, i) => i !== index) },
   });
+  return toEventData(updated);
+}
+
+// Pone (o reemplaza) la foto de la historia. Devuelve null si el evento no es del usuario.
+export async function setStoryPhoto(ownerId: string, id: string, file: Buffer, mimeType: string) {
+  const event = await prisma.event.findFirst({ where: { id, ownerId } });
+  if (!event) {
+    return null;
+  }
+  const path = await storePhoto(event.id, file, mimeType, 'story/');
+  const updated = await prisma.event.update({ where: { id: event.id }, data: { storyPhoto: path } });
+  await deleteStoredPhotos(event.storyPhoto ? [event.storyPhoto] : []);
+  return toEventData(updated);
+}
+
+// Quita la foto de la historia. Devuelve null si el evento no es del usuario.
+export async function removeStoryPhoto(ownerId: string, id: string) {
+  const event = await prisma.event.findFirst({ where: { id, ownerId } });
+  if (!event) {
+    return null;
+  }
+  const updated = await prisma.event.update({ where: { id: event.id }, data: { storyPhoto: null } });
+  await deleteStoredPhotos(event.storyPhoto ? [event.storyPhoto] : []);
+  return toEventData(updated);
+}
+
+// Suma una foto al final del álbum. Devuelve null si el evento no es del usuario.
+export async function addAlbumPhoto(ownerId: string, id: string, file: Buffer, mimeType: string) {
+  const event = await prisma.event.findFirst({ where: { id, ownerId } });
+  if (!event) {
+    return null;
+  }
+  if (event.albumPhotos.length >= MAX_ALBUM_PHOTOS) {
+    throw new CoverPhotoError(`El álbum puede tener hasta ${MAX_ALBUM_PHOTOS} fotos.`, 400);
+  }
+  const path = await storePhoto(event.id, file, mimeType, 'album/');
+  const updated = await prisma.event.update({
+    where: { id: event.id },
+    data: { albumPhotos: { push: path } },
+  });
+  return toEventData(updated);
+}
+
+// Quita la foto del álbum de la posición indicada. Devuelve null si el evento no es del usuario.
+export async function removeAlbumPhoto(ownerId: string, id: string, index: number) {
+  const event = await prisma.event.findFirst({ where: { id, ownerId } });
+  if (!event) {
+    return null;
+  }
+  const path = event.albumPhotos[index];
+  if (!path) {
+    throw new CoverPhotoError('No encontramos esa foto.', 404);
+  }
+  const updated = await prisma.event.update({
+    where: { id: event.id },
+    data: { albumPhotos: event.albumPhotos.filter((_, i) => i !== index) },
+  });
+  await deleteStoredPhotos([path]);
   return toEventData(updated);
 }

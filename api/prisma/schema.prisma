@@ -48,6 +48,14 @@ model Event {
   // Playlist: link a una playlist de Spotify. La invitación muestra el reproductor de Spotify.
   spotifyPlaylistUrl String? @map("spotify_playlist_url")
 
+  // Historia, álbum y frase final. Las fotos son rutas en Supabase Storage.
+  storyTitle    String?  @map("story_title")
+  storyText     String?  @map("story_text")
+  storyPhoto    String?  @map("story_photo")
+  // Hasta 8 fotos, en orden.
+  albumPhotos   String[] @default([]) @map("album_photos")
+  closingPhrase String?  @map("closing_phrase")
+
   // Link para que los novios vean su invitación con una familia de ejemplo.
   // Es distinto de los links de los invitados y se crea la primera vez que se pide.
   previewToken String? @unique @map("preview_token")
