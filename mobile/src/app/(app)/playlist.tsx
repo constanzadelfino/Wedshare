@@ -52,7 +52,7 @@ export default function PlaylistScreen() {
             onChange={playlist.setShowPlaylist}
           />
           <TextField
-            label="Link de tu playlist de Spotify"
+            label="Link de tu playlist colaborativa"
             placeholder="https://open.spotify.com/playlist/..."
             value={playlist.url}
             onChangeText={playlist.setUrl}
@@ -60,16 +60,25 @@ export default function PlaylistScreen() {
             autoCorrect={false}
             keyboardType="url"
           />
-          <Text style={styles.note}>
-            Para que tus invitados sumen canciones, en Spotify abrí la playlist, tocá el ícono de
-            agregar persona (Invitar colaboradores) y pegá ese link acá. Si solo querés que la
-            escuchen, usá Compartir y Copiar link (la playlist tiene que ser pública).
-          </Text>
+          <View style={styles.note}>
+            <Text style={styles.noteTitle}>
+              Para que tus invitados sumen canciones, la playlist tiene que ser colaborativa:
+            </Text>
+            {[
+              'En Spotify, creá una playlist para la fiesta.',
+              'Abrila y tocá el ícono de agregar persona (Invitar colaboradores).',
+              'Copiá el link que te da Spotify y pegalo acá.',
+            ].map((step, index) => (
+              <Text key={step} style={styles.noteText}>
+                {index + 1}. {step}
+              </Text>
+            ))}
+          </View>
           {event.spotifyPlaylistUrl ? (
             <Text style={styles.linkKind}>
               {isCollaborativeLink(event.spotifyPlaylistUrl)
                 ? 'Tus invitados pueden sumar canciones con este link.'
-                : 'Con este link tus invitados la escuchan, pero no pueden sumar canciones.'}
+                : 'Este link no es el de Invitar colaboradores: tus invitados la escuchan, pero no pueden sumar canciones.'}
             </Text>
           ) : null}
           {event.spotifyPlaylistUrl ? (
@@ -83,16 +92,25 @@ export default function PlaylistScreen() {
 
 const styles = StyleSheet.create({
   note: {
+    gap: 4,
+    backgroundColor: colors.iconBackground,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  noteTitle: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 13,
+    lineHeight: 19,
+    color: colors.text,
+  },
+  noteText: {
     fontFamily: fonts.regular,
     fontStyle: 'normal',
     fontSize: 13,
     lineHeight: 19,
     color: colors.textSecondary,
-    backgroundColor: colors.iconBackground,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    overflow: 'hidden',
   },
   linkKind: {
     ...text.link,
