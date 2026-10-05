@@ -45,7 +45,7 @@ export function GiftsDialog({ gifts, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="gifts-title"
-        className="flex max-h-[88dvh] w-full max-w-[480px] flex-col rounded-t-[22px] bg-card shadow-card sm:rounded-[22px]"
+        className="flex max-h-[88dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[22px] bg-card shadow-card sm:rounded-[22px]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="overflow-y-auto px-6 pt-6 pb-4">

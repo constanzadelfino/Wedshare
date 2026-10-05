@@ -48,7 +48,7 @@ export function RsvpDialog({ invitation, rsvp }: Props) {
         aria-labelledby="rsvp-title"
         onSubmit={rsvp.submit}
         noValidate
-        className="flex max-h-[92dvh] w-full max-w-[480px] flex-col rounded-t-[22px] bg-bg shadow-card sm:rounded-[22px]"
+        className="flex max-h-[92dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[22px] bg-bg shadow-card sm:rounded-[22px]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex flex-col gap-4 overflow-y-auto px-6 pt-6 pb-4">
