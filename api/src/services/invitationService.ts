@@ -54,6 +54,7 @@ function toInvitationEvent(event: EventWithDetails): InvitationData['event'] {
     rsvpDeadline,
     rsvpClosed: isRsvpClosed(rsvpDeadline),
     dressCode: event.dressCode,
+    spotifyPlaylistUrl: event.playlistEnabled ? event.spotifyPlaylistUrl : null,
     items: event.items.map((item) => ({
       id: item.id,
       kind: item.kind,

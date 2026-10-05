@@ -45,6 +45,9 @@ export type InvitationData = {
       latitude: number | null;
       longitude: number | null;
     }[];
+    // Playlist de Spotify de los novios, tal como la pegaron (puede ser la invitación a colaborar).
+    // null si apagaron la sección o no cargaron el link.
+    spotifyPlaylistUrl: string | null;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: {
       // null si no cargaron ningún dato de la cuenta.

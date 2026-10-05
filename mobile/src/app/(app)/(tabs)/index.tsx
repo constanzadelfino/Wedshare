@@ -89,9 +89,9 @@ export default function InicioScreen() {
               onPress={() => router.push('/personalizar')}
             />
             <QuickAction
-              title="Playlist del DJ"
-              description="Canciones sugeridas por los invitados"
-              comingSoon
+              title="Playlist"
+              description="Tu playlist de Spotify"
+              onPress={() => router.push('/playlist')}
               icon={
                 <Svg {...quickActionIconProps}>
                   <Path d="M9 18V5l12-2v13" />

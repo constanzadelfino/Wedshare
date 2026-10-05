@@ -24,6 +24,8 @@ export type Event = {
   // 22 números (CBU o CVU).
   giftCbu: string | null;
   giftMailbox: boolean;
+  // Link a una playlist de Spotify (la invitación muestra su reproductor).
+  spotifyPlaylistUrl: string | null;
 };
 
 export type NewEvent = Pick<
@@ -35,3 +37,9 @@ export type NewEvent = Pick<
 export type EventChanges = Partial<Omit<Event, 'id' | 'coverPhotoUrls'>>;
 
 export const MAX_COVER_PHOTOS = 3;
+
+// El link de "Invitar colaboradores" de Spotify trae pt=...: con ese, los invitados pueden
+// sumar canciones a la playlist.
+export function isCollaborativeLink(url: string) {
+  return /[?&]pt=/.test(url);
+}

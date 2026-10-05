@@ -45,6 +45,9 @@ model Event {
   giftCbu     String? @map("gift_cbu")
   giftMailbox Boolean @default(false) @map("gift_mailbox")
 
+  // Playlist: link a una playlist de Spotify. La invitación muestra el reproductor de Spotify.
+  spotifyPlaylistUrl String? @map("spotify_playlist_url")
+
   // Link para que los novios vean su invitación con una familia de ejemplo.
   // Es distinto de los links de los invitados y se crea la primera vez que se pide.
   previewToken String? @unique @map("preview_token")

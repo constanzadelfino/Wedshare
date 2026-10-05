@@ -90,6 +90,8 @@ export type Invitation = {
     rsvpClosed: boolean;
     dressCode: string | null;
     items: InvitationItem[];
+    // Link a la playlist de Spotify de los novios. null si no hay.
+    spotifyPlaylistUrl: string | null;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: InvitationGifts | null;
   };

@@ -8,6 +8,7 @@ import { DateSection } from './DateSection';
 import { DressCodeSection } from './DressCodeSection';
 import { EventsSection } from './EventsSection';
 import { GiftsSection } from './GiftsSection';
+import { PlaylistSection } from './PlaylistSection';
 import { QrSection } from './QrSection';
 import { RsvpSection } from './RsvpSection';
 import { ThanksScreen } from './ThanksScreen';
@@ -52,6 +53,7 @@ export function InvitationView({ inviteToken, invitation, onChange }: Props) {
       <DateSection date={event.date} start={start} calendarUrl={calendarUrl} />
       {event.items.length > 0 && <EventsSection items={event.items} />}
       {event.dressCode && <DressCodeSection dressCode={event.dressCode} />}
+      {event.spotifyPlaylistUrl && <PlaylistSection url={event.spotifyPlaylistUrl} />}
       {event.gifts && <GiftsSection gifts={event.gifts} />}
       <RsvpSection invitation={invitation} rsvp={rsvp} />
       <QrSection invitation={invitation} onChangeAnswer={changeAnswer} />

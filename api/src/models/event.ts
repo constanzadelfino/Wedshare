@@ -25,6 +25,9 @@ export type EventData = {
   // 22 números (CBU o CVU).
   giftCbu: string | null;
   giftMailbox: boolean;
+  // Link a una playlist de Spotify, tal como lo copiaron. Si es el de "Invitar colaboradores"
+  // (trae pt=...), los invitados pueden sumar canciones.
+  spotifyPlaylistUrl: string | null;
 };
 
 // Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
@@ -48,6 +51,17 @@ const OPTIONAL_TEXT_FIELDS = {
   giftBank: { max: 80, label: 'El banco' },
   giftHolder: { max: 80, label: 'El titular' },
 } as const;
+
+// Link de una playlist de Spotify, como lo da "Compartir → Copiar link" (puede traer
+// el idioma, como /intl-es/, y ?si=... al final).
+const SPOTIFY_PLAYLIST_PATTERN = /^https:\/\/open\.spotify\.com\/(?:intl-[a-z-]+\/)?playlist\/([A-Za-z0-9]{10,40})(?:[/?#].*)?$/;
+
+// Devuelve el link sin espacios, o null si no es un link de playlist de Spotify. Se guarda
+// completo: los parámetros del final pueden ser la invitación a colaborar (pt=...).
+export function normalizeSpotifyPlaylistUrl(value: string) {
+  const url = value.trim();
+  return SPOTIFY_PLAYLIST_PATTERN.test(url) && url.length <= 500 ? url : null;
+}
 
 // Alias de una cuenta en Argentina: de 6 a 20 letras, números, puntos o guiones.
 const ALIAS_PATTERN = /^[A-Za-z0-9.-]{6,20}$/;
@@ -130,6 +144,19 @@ export function validateEventInput(body: unknown, partial: boolean): ValidationR
       return { error: 'Revisá el CBU: tiene que tener 22 números.' };
     }
     data.giftCbu = cbu || null;
+  }
+
+  if (input.spotifyPlaylistUrl !== undefined) {
+    const value = input.spotifyPlaylistUrl;
+    if (value === null || value === '') {
+      data.spotifyPlaylistUrl = null;
+    } else {
+      const url = typeof value === 'string' ? normalizeSpotifyPlaylistUrl(value) : null;
+      if (!url) {
+        return { error: 'Revisá el link: tiene que ser de una playlist de Spotify (Compartir → Copiar link).' };
+      }
+      data.spotifyPlaylistUrl = url;
+    }
   }
 
   if (input.rsvpDeadline !== undefined) {

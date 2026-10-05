@@ -42,6 +42,7 @@ function toEventData(event: Event): EventData {
     giftAlias: event.giftAlias,
     giftCbu: event.giftCbu,
     giftMailbox: event.giftMailbox,
+    spotifyPlaylistUrl: event.spotifyPlaylistUrl,
   };
 }
 
