@@ -19,6 +19,18 @@ export async function get(req: Request<TokenParams>, res: Response) {
   res.json(invitation);
 }
 
+// GET /invitations/preview/:token (vista previa de los novios)
+export async function getPreview(req: Request<TokenParams>, res: Response) {
+  const invitation = isInviteToken(req.params.token)
+    ? await invitationService.getPreview(req.params.token)
+    : null;
+  if (!invitation) {
+    res.status(404).json({ error: 'No encontramos esta vista previa. Abrila de nuevo desde la app.' });
+    return;
+  }
+  res.json(invitation);
+}
+
 async function saveRsvp(req: Request<TokenParams>, res: Response, mode: 'create' | 'update') {
   if (!isInviteToken(req.params.token)) {
     res.status(404).json(NOT_FOUND);

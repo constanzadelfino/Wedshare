@@ -23,5 +23,6 @@ eventRoutes.post('/', eventController.create);
 eventRoutes.get('/:id', eventController.show);
 eventRoutes.patch('/:id', eventController.update);
 eventRoutes.delete('/:id', eventController.remove);
+eventRoutes.post('/:id/preview', eventController.preview);
 eventRoutes.post('/:id/cover-photos', photoUpload.single('photo'), eventController.addCoverPhoto);
 eventRoutes.delete('/:id/cover-photos/:index', eventController.removeCoverPhoto);

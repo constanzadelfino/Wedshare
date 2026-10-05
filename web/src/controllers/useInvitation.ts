@@ -1,28 +1,28 @@
 import { useEffect, useState } from 'react';
 
 import { Invitation } from '../models/Invitation';
-import { getInvitation } from '../services/invitationService';
+import { getInvitation, getPreview } from '../services/invitationService';
 
 type State =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'ready'; invitation: Invitation };
 
-// Carga la invitación del grupo según el token del link.
-export function useInvitation(inviteToken: string) {
+// Carga la invitación del grupo según el token del link, o la vista previa de los novios.
+export function useInvitation(inviteToken: string, preview: boolean) {
   const [state, setState] = useState<State>({ status: 'loading' });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let active = true;
     setState({ status: 'loading' });
-    getInvitation(inviteToken)
+    (preview ? getPreview(inviteToken) : getInvitation(inviteToken))
       .then((invitation) => active && setState({ status: 'ready', invitation }))
       .catch((error: Error) => active && setState({ status: 'error', message: error.message }));
     return () => {
       active = false;
     };
-  }, [inviteToken, attempt]);
+  }, [inviteToken, preview, attempt]);
 
   return {
     state,

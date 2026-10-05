@@ -1,8 +1,9 @@
 import { InvitationPage } from './views/InvitationPage';
 import { StatusScreen } from './views/StatusScreen';
 
-// Cada grupo entra por /invitacion/<token>. La landing se suma más adelante.
-const INVITATION_PATH = /^\/invitacion\/([^/]+)\/?$/;
+// Cada grupo entra por /invitacion/<token>, y los novios ven la vista previa en
+// /invitacion/vista-previa/<token>. La landing se suma más adelante.
+const INVITATION_PATH = /^\/invitacion\/(vista-previa\/)?([^/]+)\/?$/;
 
 export function App() {
   const match = window.location.pathname.match(INVITATION_PATH);
@@ -14,5 +15,5 @@ export function App() {
       />
     );
   }
-  return <InvitationPage inviteToken={decodeURIComponent(match[1])} />;
+  return <InvitationPage inviteToken={decodeURIComponent(match[2])} preview={!!match[1]} />;
 }

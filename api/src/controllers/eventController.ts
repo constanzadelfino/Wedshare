@@ -71,6 +71,18 @@ export async function update(req: Request<IdParams>, res: Response) {
   res.json(await eventService.updateEvent(res.locals.userId, req.params.id, result.data));
 }
 
+// POST /events/:id/preview: devuelve el token del link de vista previa (lo crea si no existe).
+export async function preview(req: Request<IdParams>, res: Response) {
+  const token = isUuid(req.params.id)
+    ? await eventService.getPreviewToken(res.locals.userId, req.params.id)
+    : null;
+  if (!token) {
+    res.status(404).json(NOT_FOUND);
+    return;
+  }
+  res.json({ token });
+}
+
 // DELETE /events/:id
 export async function remove(req: Request<IdParams>, res: Response) {
   const deleted =

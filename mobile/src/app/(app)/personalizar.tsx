@@ -12,8 +12,10 @@ import { SegmentedTabs } from '../../components/SegmentedTabs';
 import { TextField } from '../../components/TextField';
 import { ToggleRow } from '../../components/ToggleRow';
 import { useEventItems } from '../../controllers/useEventItems';
+import { useInvitationPreview } from '../../controllers/useInvitationPreview';
 import { usePersonalize } from '../../controllers/usePersonalize';
 import { MAX_COVER_PHOTOS } from '../../models/Event';
+import { EVENT_ITEM_KINDS } from '../../models/EventItem';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
 
@@ -29,6 +31,7 @@ export default function PersonalizarScreen() {
   const [tab, setTab] = useState<Tab>('cover');
   const form = usePersonalize();
   const items = useEventItems();
+  const preview = useInvitationPreview(form.event?.id);
 
   return (
     <Screen
@@ -37,9 +40,22 @@ export default function PersonalizarScreen() {
       footer={
         form.event ? (
           <View style={styles.footer}>
-            <FormError message={form.formError} />
+            <FormError message={form.formError ?? preview.error} />
             {form.saved ? <Text style={styles.saved}>Cambios guardados.</Text> : null}
-            <Button title="Guardar" loading={form.saving} onPress={form.handleSave} />
+            {/* Como en el diseño: "Ver mi invitación" al lado de Guardar. Muestra lo guardado. */}
+            <View style={styles.footerRow}>
+              <View style={styles.footerButton}>
+                <Button
+                  title="Ver mi invitación"
+                  variant="outline"
+                  loading={preview.opening}
+                  onPress={preview.openPreview}
+                />
+              </View>
+              <View style={styles.footerButton}>
+                <Button title="Guardar" loading={form.saving} onPress={form.handleSave} />
+              </View>
+            </View>
           </View>
         ) : null
       }
@@ -114,7 +130,7 @@ export default function PersonalizarScreen() {
                 <FormError message={items.error} />
               ) : items.items.length === 0 ? (
                 <Text style={text.body}>
-                  Todavía no agregaste eventos. Sumá el civil, la ceremonia o el festejo.
+                  Todavía no agregaste eventos. Sumá el festejo, la ceremonia o el civil.
                 </Text>
               ) : (
                 <View style={styles.items}>
@@ -127,11 +143,14 @@ export default function PersonalizarScreen() {
                   ))}
                 </View>
               )}
-              <Button
-                title="Agregar evento"
-                variant="outline"
-                onPress={() => router.push('/editar-evento')}
-              />
+              {/* Hay como máximo un festejo, una ceremonia y un civil. */}
+              {items.items.length < EVENT_ITEM_KINDS.length ? (
+                <Button
+                  title="Agregar evento"
+                  variant="outline"
+                  onPress={() => router.push('/editar-evento')}
+                />
+              ) : null}
               <TextField
                 label="Dress code y nota"
                 placeholder="Ej: Formal. Blanco reservado para la novia"
@@ -164,6 +183,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.accentText,
     textAlign: 'center',
+  },
+  footerRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  footerButton: {
+    flex: 1,
   },
   footer: {
     width: '100%',

@@ -58,6 +58,10 @@ export function useRsvp(
     if (submitting) {
       return;
     }
+    if (invitation.preview) {
+      setError('Esto es una vista previa: la respuesta no se guarda. Así lo ven tus invitados.');
+      return;
+    }
     setSubmitting(true);
     setError(null);
     const input = {

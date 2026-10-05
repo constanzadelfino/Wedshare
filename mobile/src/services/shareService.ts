@@ -13,6 +13,16 @@ export function buildInviteLink(inviteToken: string) {
   return inviteBaseUrl ? `${inviteBaseUrl}/${inviteToken}` : null;
 }
 
+// Link de la vista previa de los novios (su invitación con una familia de ejemplo).
+export function buildPreviewLink(previewToken: string) {
+  return inviteBaseUrl ? `${inviteBaseUrl}/vista-previa/${previewToken}` : null;
+}
+
+// Abre un link en el navegador del celular.
+export function openLink(url: string) {
+  return Linking.openURL(url);
+}
+
 // Si el grupo tiene WhatsApp, abre el chat con ese número y el mensaje listo.
 // Si no, abre el menú de compartir del celular para elegir el contacto o la app.
 export async function sendInvite(message: string, phone: string | null) {

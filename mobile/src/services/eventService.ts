@@ -21,6 +21,12 @@ export function updateEvent(id: string, changes: EventChanges) {
   return apiRequest<Event>('PATCH', `/events/${id}`, changes);
 }
 
+// Token del link de vista previa. La API lo crea la primera vez.
+export async function getPreviewToken(id: string) {
+  const { token } = await apiRequest<{ token: string }>('POST', `/events/${id}/preview`);
+  return token;
+}
+
 // Sube una foto de portada (ya achicada) desde el archivo del celular.
 // El fetch de Expo no acepta el formato { uri, name, type } de React Native:
 // el archivo tiene que ir como File de expo-file-system.
