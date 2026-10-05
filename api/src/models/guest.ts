@@ -7,6 +7,8 @@ export type GuestData = {
   id: string;
   name: string;
   status: GuestStatus;
+  // Preferencia alimentaria que anotó al confirmar.
+  dietary: string | null;
 };
 
 export type GuestGroupData = {
@@ -16,6 +18,8 @@ export type GuestGroupData = {
   // Va en el link de la invitación del grupo.
   inviteToken: string;
   guests: GuestData[];
+  // Mensaje que dejó el grupo para los novios al confirmar.
+  message: string | null;
 };
 
 export type GuestGroupInput = {

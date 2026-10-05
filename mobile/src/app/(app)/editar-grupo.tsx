@@ -5,6 +5,7 @@ import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { PersonRow } from '../../components/PersonRow';
 import { Screen } from '../../components/Screen';
+import { StatusBadge } from '../../components/StatusBadge';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
 import { useEditGuestGroup } from '../../controllers/useEditGuestGroup';
@@ -67,6 +68,30 @@ export default function EditarGrupoScreen() {
             <Button title="Copiar link" variant="outline" onPress={form.handleCopy} />
             {form.shareMessage ? <Text style={styles.shareMessage}>{form.shareMessage}</Text> : null}
           </View>
+
+          {/* Lo que respondió el grupo. Se muestra cuando alguien ya contestó. */}
+          {form.group && form.group.guests.some((guest) => guest.status !== 'pending') ? (
+            <View style={styles.shareCard}>
+              <Text style={text.sectionLabel}>Respuesta</Text>
+              {form.group.guests.map((guest) => (
+                <View key={guest.id} style={styles.answer}>
+                  <View style={styles.answerTexts}>
+                    <Text style={styles.answerName}>{guest.name}</Text>
+                    {guest.status === 'confirmed' && guest.dietary ? (
+                      <Text style={styles.answerDetail}>{guest.dietary}</Text>
+                    ) : null}
+                  </View>
+                  <StatusBadge status={guest.status} />
+                </View>
+              ))}
+              {form.group.message ? (
+                <View style={styles.message}>
+                  <Text style={text.label}>Mensaje para ustedes</Text>
+                  <Text style={styles.messageText}>{form.group.message}</Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
 
           <View style={styles.fields}>
             <TextField
@@ -136,6 +161,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.accentText,
     textAlign: 'center',
+  },
+  answer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  answerTexts: {
+    flex: 1,
+    gap: 2,
+  },
+  answerName: {
+    fontFamily: fonts.medium,
+    fontStyle: 'normal',
+    fontSize: 16,
+    color: colors.text,
+  },
+  answerDetail: {
+    fontFamily: fonts.regular,
+    fontStyle: 'normal',
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  message: {
+    gap: 4,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  messageText: {
+    fontFamily: fonts.regular,
+    fontStyle: 'normal',
+    fontSize: 15,
+    lineHeight: 21,
+    color: colors.text,
   },
   fields: {
     gap: 14,

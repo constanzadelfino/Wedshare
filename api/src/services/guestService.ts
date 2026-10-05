@@ -1,19 +1,25 @@
 import { randomBytes } from 'node:crypto';
 
-import { Guest, GuestGroup } from '../../generated/prisma/client';
+import { Guest, GuestGroup, Rsvp } from '../../generated/prisma/client';
 import { prisma } from '../lib/prisma';
 import { GuestGroupData, GuestGroupInput, GuestGroupUpdate } from '../models/guest';
 
 // Los grupos se buscan siempre a través del evento del usuario:
 // cada pareja solo ve y toca a sus invitados.
 
-function toGuestGroupData(group: GuestGroup & { guests: Guest[] }): GuestGroupData {
+function toGuestGroupData(group: GuestGroup & { guests: Guest[]; rsvp: Rsvp | null }): GuestGroupData {
   return {
     id: group.id,
     name: group.name,
     phone: group.phone,
     inviteToken: group.inviteToken,
-    guests: group.guests.map((guest) => ({ id: guest.id, name: guest.name, status: guest.status })),
+    guests: group.guests.map((guest) => ({
+      id: guest.id,
+      name: guest.name,
+      status: guest.status,
+      dietary: guest.dietary,
+    })),
+    message: group.rsvp?.message ?? null,
   };
 }
 
@@ -22,7 +28,7 @@ function newInviteToken() {
   return randomBytes(16).toString('base64url');
 }
 
-const withGuests = { guests: { orderBy: { createdAt: 'asc' } } } as const;
+const withGuests = { guests: { orderBy: { createdAt: 'asc' } }, rsvp: true } as const;
 
 export async function listGuestGroups(eventId: string) {
   const groups = await prisma.guestGroup.findMany({

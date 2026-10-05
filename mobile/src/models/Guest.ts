@@ -5,6 +5,8 @@ export type Guest = {
   id: string;
   name: string;
   status: GuestStatus;
+  // Preferencia alimentaria que anotó al confirmar.
+  dietary: string | null;
 };
 
 // Una familia o grupo. Recibe un link único y confirma una sola vez.
@@ -15,6 +17,8 @@ export type GuestGroup = {
   // Va en el link de la invitación del grupo.
   inviteToken: string;
   guests: Guest[];
+  // Mensaje que dejó el grupo para los novios al confirmar.
+  message: string | null;
 };
 
 // Al editar: si una persona trae id, se conserva (con su respuesta); si no, se agrega.
