@@ -32,7 +32,18 @@ export type Event = {
   storyPhotoUrl: string | null;
   albumPhotoUrls: string[];
   closingPhrase: string | null;
+  // Música de fondo: el id de una de las canciones de Wedshare, o null.
+  backgroundMusic: BackgroundMusic | null;
 };
+
+// Canciones de fondo que ofrece Wedshare: grabaciones libres (ver web/public/music/CREDITOS.md).
+// No se pueden subir canciones propias (decisión de Constanza, por los derechos de autor).
+export type BackgroundMusic = 'canon' | 'clair-de-lune';
+
+export const BACKGROUND_MUSIC_OPTIONS: { value: BackgroundMusic; title: string; detail: string }[] = [
+  { value: 'canon', title: 'Canon en re', detail: 'Pachelbel · piano' },
+  { value: 'clair-de-lune', title: 'Claro de luna', detail: 'Debussy · piano' },
+];
 
 export type NewEvent = Pick<
   Event,

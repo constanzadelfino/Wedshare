@@ -53,6 +53,8 @@ export type InvitationData = {
     // Direcciones públicas de las fotos del álbum, en orden.
     albumPhotoUrls: string[];
     closingPhrase: string | null;
+    // Música de fondo: el id de una de las canciones de Wedshare, o null.
+    backgroundMusic: string | null;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: {
       // null si no cargaron ningún dato de la cuenta.

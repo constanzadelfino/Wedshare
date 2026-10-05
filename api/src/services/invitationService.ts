@@ -65,6 +65,7 @@ function toInvitationEvent(event: EventWithDetails): InvitationData['event'] {
         : null,
     albumPhotoUrls: storage ? event.albumPhotos.map((path) => publicPhotoUrl(storage, path)) : [],
     closingPhrase: event.closingPhrase,
+    backgroundMusic: event.backgroundMusic,
     items: event.items.map((item) => ({
       id: item.id,
       kind: item.kind,

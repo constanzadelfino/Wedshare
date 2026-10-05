@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Event, MAX_ALBUM_PHOTOS } from '../models/Event';
+import { BackgroundMusic, Event, MAX_ALBUM_PHOTOS } from '../models/Event';
 import { ApiError } from '../services/apiClient';
 import {
   getMyEvent,
@@ -28,6 +28,7 @@ export function useStory() {
   const [storyTitle, setStoryTitle] = useState('');
   const [storyText, setStoryText] = useState('');
   const [closingPhrase, setClosingPhrase] = useState('');
+  const [backgroundMusic, setBackgroundMusic] = useState<BackgroundMusic | null>(null);
   const [photoBusy, setPhotoBusy] = useState<PhotoBusy>(null);
   const [photoError, setPhotoError] = useState<string>();
   const [formError, setFormError] = useState<string>();
@@ -44,6 +45,7 @@ export function useStory() {
         setStoryTitle(myEvent.storyTitle ?? '');
         setStoryText(myEvent.storyText ?? '');
         setClosingPhrase(myEvent.closingPhrase ?? '');
+        setBackgroundMusic(myEvent.backgroundMusic);
       })
       .catch((error) => setLoadError(errorMessage(error, 'No pudimos cargar tu invitación.')))
       .finally(() => setLoading(false));
@@ -113,6 +115,7 @@ export function useStory() {
         storyTitle: storyTitle.trim() || null,
         storyText: storyText.trim() || null,
         closingPhrase: closingPhrase.trim() || null,
+        backgroundMusic,
       });
       setEvent(updated);
       setSaved(true);
@@ -133,6 +136,8 @@ export function useStory() {
     setStoryText: edit(setStoryText),
     closingPhrase,
     setClosingPhrase: edit(setClosingPhrase),
+    backgroundMusic,
+    setBackgroundMusic: edit(setBackgroundMusic),
     storyPhotoUrl: event?.storyPhotoUrl ?? null,
     albumPhotoUrls: event?.albumPhotoUrls ?? [],
     // Posición de la foto del álbum que se está subiendo o quitando.
