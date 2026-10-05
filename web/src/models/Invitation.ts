@@ -97,6 +97,7 @@ export type Invitation = {
 
 // Lo que manda el invitado al confirmar o cambiar su respuesta.
 export type RsvpInput = {
-  guests: { id: string; attending: boolean; dietary: string | null }[];
+  // attending: true asiste, false no asiste, null todavía no sabe (queda pendiente).
+  guests: { id: string; attending: boolean | null; dietary: string | null }[];
   message: string | null;
 };

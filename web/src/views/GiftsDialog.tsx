@@ -20,8 +20,12 @@ export function GiftsDialog({ gifts, onClose }: Props) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const bankRef = useRef<HTMLDivElement>(null);
 
+  // Solo al abrir: si no, cada vez que se redibuja (por ejemplo al copiar) volvería al título.
   useEffect(() => {
     titleRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         onClose();

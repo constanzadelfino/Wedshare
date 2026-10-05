@@ -29,9 +29,9 @@ export function InvitationView({ inviteToken, invitation, onChange }: Props) {
   const { event } = invitation;
   const rsvp = useRsvp(inviteToken, invitation, onChange);
 
+  // Abre el panel de confirmación (desde el agradecimiento o el pase).
   function changeAnswer() {
     rsvp.startEditing();
-    scrollToSection('rsvp');
   }
 
   // La cuenta regresiva y el calendario usan la primera parte del casamiento de ese día

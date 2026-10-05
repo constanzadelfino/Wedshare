@@ -13,3 +13,11 @@ export function splitCoupleNames(coupleNames: string | null) {
 export function coupleInitials(coupleNames: string | null) {
   return splitCoupleNames(coupleNames).map((name) => name.charAt(0).toUpperCase());
 }
+
+// Une nombres como en una frase: "Ana", "Ana y Juan", "Ana, Juan y Sofía".
+export function joinNames(names: string[]) {
+  if (names.length <= 1) {
+    return names.join('');
+  }
+  return `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`;
+}

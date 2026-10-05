@@ -68,9 +68,10 @@ export function isRsvpClosed(deadline: string | null, now = new Date()) {
 }
 
 // Lo que manda el invitado al confirmar o cambiar su respuesta: cada persona del grupo,
-// si asiste y su preferencia alimentaria, y un mensaje opcional para los novios.
+// si asiste (true), no asiste (false) o todavía no sabe (null, queda pendiente), su
+// preferencia alimentaria y un mensaje opcional para los novios.
 export type RsvpInput = {
-  guests: { id: string; attending: boolean; dietary: string | null }[];
+  guests: { id: string; attending: boolean | null; dietary: string | null }[];
   message: string | null;
 };
 
@@ -99,7 +100,7 @@ export function validateRsvpInput(body: unknown): ValidationResult {
       return { error: 'Los datos de las personas no son válidos.' };
     }
     const { id, attending, dietary } = guest as Record<string, unknown>;
-    if (typeof id !== 'string' || !UUID_PATTERN.test(id) || typeof attending !== 'boolean') {
+    if (typeof id !== 'string' || !UUID_PATTERN.test(id) || (typeof attending !== 'boolean' && attending !== null)) {
       return { error: 'Los datos de las personas no son válidos.' };
     }
     if (dietary !== undefined && dietary !== null && typeof dietary !== 'string') {
@@ -110,6 +111,9 @@ export function validateRsvpInput(body: unknown): ValidationResult {
       return { error: `La preferencia alimentaria puede tener hasta ${MAX_DIETARY} caracteres.` };
     }
     guests.push({ id, attending, dietary: text });
+  }
+  if (guests.every((guest) => guest.attending === null)) {
+    return { error: 'Elegí si asiste o no al menos una persona.' };
   }
 
   if (input.message !== undefined && input.message !== null && typeof input.message !== 'string') {

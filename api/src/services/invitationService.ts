@@ -164,12 +164,16 @@ export async function saveRsvp(inviteToken: string, input: RsvpInput, mode: 'cre
     throw new RsvpError('La lista de personas cambió. Recargá la página e intentá de nuevo.', 409);
   }
 
-  const anyoneAttending = input.guests.some((guest) => guest.attending);
+  const anyoneAttending = input.guests.some((guest) => guest.attending === true);
   await prisma.$transaction(async (tx) => {
     for (const guest of input.guests) {
       await tx.guest.update({
         where: { id: guest.id },
-        data: { status: guest.attending ? 'confirmed' : 'declined', dietary: guest.dietary },
+        // Quien todavía no sabe queda pendiente: puede responder más adelante.
+        data: {
+          status: guest.attending === null ? 'pending' : guest.attending ? 'confirmed' : 'declined',
+          dietary: guest.dietary,
+        },
       });
     }
     await tx.rsvp.upsert({
