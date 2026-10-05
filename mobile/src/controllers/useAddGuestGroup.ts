@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
+import { familyName, familySurname } from '../models/Guest';
 import { ApiError } from '../services/apiClient';
 import { createGuestGroup } from '../services/guestService';
 import { isValidPhone } from '../utils/validation';
 
 export const MAX_PEOPLE_PER_GROUP = 20;
 
-// "single": una persona que va sola. "group": una familia o grupo.
+// "single": una persona que va sola. "group": una familia (su nombre empieza con "Familia").
 // Por dentro, una persona sola es un grupo de una persona con su mismo nombre.
 export type AddMode = 'single' | 'group';
 
@@ -55,8 +56,8 @@ export function useAddGuestGroup(onSaved: () => void) {
         errors.person = 'Escribí el nombre y apellido.';
       }
     } else {
-      if (!name.trim()) {
-        errors.name = 'Escribí el nombre del grupo.';
+      if (!familySurname(name)) {
+        errors.name = 'Escribí el apellido de la familia.';
       }
       if (!people.some((person) => person.trim())) {
         errors.people = 'Escribí el nombre de al menos una persona.';
@@ -81,7 +82,7 @@ export function useAddGuestGroup(onSaved: () => void) {
         mode === 'single'
           ? { name: personName.trim(), phone: phone.trim() || null, guests: [personName.trim()] }
           : {
-              name: name.trim(),
+              name: familyName(name),
               phone: phone.trim() || null,
               guests: people.map((person) => person.trim()).filter(Boolean),
             },

@@ -9,10 +9,11 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
 import { useEditGuestGroup } from '../../controllers/useEditGuestGroup';
+import { FAMILY_PREFIX } from '../../models/Guest';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
 
-// Un grupo de invitados: compartir su link, editar sus datos y borrarlo.
+// Una familia o un invitado solo: compartir su link, editar sus datos y borrarlo.
 // Pantalla sin diseño propio: sigue el estilo de Agregar invitados.
 export default function EditarGrupoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,8 +22,8 @@ export default function EditarGrupoScreen() {
   function confirmDelete() {
     const message = form.single
       ? `¿Querés borrar a "${form.group?.name}" de tus invitados?`
-      : `¿Querés borrar el grupo "${form.group?.name}" con todas sus personas?`;
-    Alert.alert(form.single ? 'Borrar invitado' : 'Borrar grupo', message, [
+      : `¿Querés borrar a la "${form.group?.name}" con todas sus personas?`;
+    Alert.alert(form.single ? 'Borrar invitado' : 'Borrar familia', message, [
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Borrar', style: 'destructive', onPress: form.handleDelete },
     ]);
@@ -38,7 +39,7 @@ export default function EditarGrupoScreen() {
             <FormError message={form.formError} />
             <Button title="Guardar" loading={form.saving} disabled={form.deleting} onPress={form.handleSave} />
             <Button
-              title={form.single ? 'Borrar invitado' : 'Borrar grupo'}
+              title={form.single ? 'Borrar invitado' : 'Borrar familia'}
               variant="secondary"
               loading={form.deleting}
               disabled={form.saving}
@@ -48,7 +49,7 @@ export default function EditarGrupoScreen() {
         ) : null
       }
     >
-      <ScreenHeader title={form.single ? 'Invitado' : 'Grupo'} showLogo={false} />
+      <ScreenHeader title={form.single ? 'Invitado' : 'Familia'} showLogo={false} />
 
       {form.loading ? (
         <ActivityIndicator color={colors.accent} />
@@ -69,7 +70,7 @@ export default function EditarGrupoScreen() {
             {form.shareMessage ? <Text style={styles.shareMessage}>{form.shareMessage}</Text> : null}
           </View>
 
-          {/* Lo que respondió el grupo. Se muestra cuando alguien ya contestó. */}
+          {/* Lo que respondió la familia. Se muestra cuando alguien ya contestó. */}
           {form.group && form.group.guests.some((guest) => guest.status !== 'pending') ? (
             <View style={styles.shareCard}>
               <Text style={text.sectionLabel}>Respuesta</Text>
@@ -95,8 +96,9 @@ export default function EditarGrupoScreen() {
 
           <View style={styles.fields}>
             <TextField
-              label={form.single ? 'Nombre y apellido' : 'Nombre del grupo'}
-              placeholder={form.single ? 'Ej: [Nombre] [Apellido]' : 'Ej: Familia [Apellido]'}
+              label={form.single ? 'Nombre y apellido' : 'Apellido de la familia'}
+              prefix={form.single ? undefined : FAMILY_PREFIX}
+              placeholder={form.single ? 'Ej: [Nombre] [Apellido]' : '[Apellido]'}
               value={form.name}
               onChangeText={form.setName}
               error={form.fieldErrors.name}

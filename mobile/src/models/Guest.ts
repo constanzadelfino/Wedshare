@@ -39,3 +39,17 @@ export type NewGuestGroup = {
   // Nombres de las personas del grupo.
   guests: string[];
 };
+
+// Los grupos de varias personas son familias y su nombre siempre empieza con "Familia".
+// En el formulario se escribe solo el apellido.
+export const FAMILY_PREFIX = 'Familia';
+
+// "Pérez" → "Familia Pérez". Si ya lo escribieron con "Familia", no se repite.
+export function familyName(surname: string) {
+  return `${FAMILY_PREFIX} ${familySurname(surname)}`;
+}
+
+// "Familia Pérez" → "Pérez", para mostrarlo en el campo.
+export function familySurname(name: string) {
+  return name.trim().replace(/^familia\s+/i, '').trim();
+}

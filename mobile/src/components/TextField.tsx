@@ -7,23 +7,42 @@ import { fonts, radius, text } from '../theme/typography';
 type Props = TextInputProps & {
   label: string;
   error?: string;
+  // Texto fijo al principio del campo, que no se puede borrar. Ej: "Familia".
+  prefix?: string;
 };
 
 export const TextField = forwardRef<TextInput, Props>(function TextField(
-  { label, error, style, multiline, ...inputProps },
+  { label, error, style, multiline, prefix, ...inputProps },
   ref,
 ) {
+  const input = (
+    <TextInput
+      ref={ref}
+      placeholderTextColor={colors.placeholder}
+      accessibilityLabel={prefix ? `${label}, después de ${prefix}` : label}
+      multiline={multiline}
+      style={
+        prefix
+          ? [styles.text, styles.prefixedInput, style]
+          : [styles.text, styles.input, multiline && styles.multiline, error ? styles.inputError : null, style]
+      }
+      {...inputProps}
+    />
+  );
+
   return (
     <View style={styles.container}>
       <Text style={text.label}>{label}</Text>
-      <TextInput
-        ref={ref}
-        placeholderTextColor={colors.placeholder}
-        accessibilityLabel={label}
-        multiline={multiline}
-        style={[styles.input, multiline && styles.multiline, error ? styles.inputError : null, style]}
-        {...inputProps}
-      />
+      {prefix ? (
+        <View style={[styles.input, styles.prefixRow, error ? styles.inputError : null]}>
+          <Text style={[styles.text, styles.prefix]} accessibilityElementsHidden importantForAccessibility="no">
+            {prefix}
+          </Text>
+          {input}
+        </View>
+      ) : (
+        input
+      )}
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
@@ -33,6 +52,12 @@ const styles = StyleSheet.create({
   container: {
     gap: 6,
   },
+  text: {
+    fontFamily: fonts.regular,
+    fontStyle: 'normal',
+    fontSize: 16,
+    color: colors.text,
+  },
   input: {
     height: 52,
     paddingHorizontal: 16,
@@ -40,10 +65,20 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.control,
     backgroundColor: colors.card,
-    fontFamily: fonts.regular,
-    fontStyle: 'normal',
-    fontSize: 16,
-    color: colors.text,
+  },
+  prefixRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  prefix: {
+    fontFamily: fonts.semiBold,
+    color: colors.textSecondary,
+  },
+  prefixedInput: {
+    flex: 1,
+    height: '100%',
+    padding: 0,
   },
   // Para textos largos, como el mensaje de bienvenida.
   multiline: {

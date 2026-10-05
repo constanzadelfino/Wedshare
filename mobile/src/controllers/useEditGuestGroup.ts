@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { GuestGroup, isSingleGuest } from '../models/Guest';
+import { familyName, familySurname, GuestGroup, isSingleGuest } from '../models/Guest';
 import { ApiError } from '../services/apiClient';
 import { getMyEvent } from '../services/eventService';
 import { deleteGuestGroup, listGuestGroups, updateGuestGroup } from '../services/guestService';
@@ -71,17 +71,18 @@ export function useEditGuestGroup(groupId: string, onDone: () => void) {
       .then(([groups, event]) => {
         const found = groups.find((candidate) => candidate.id === groupId);
         if (!found) {
-          throw new ApiError('No encontramos ese grupo.', 404);
+          throw new ApiError('No encontramos esa familia.', 404);
         }
         setGroup(found);
         setCoupleNames(event?.coupleNames ?? null);
         setRsvpDeadline(event?.rsvpDeadline ?? null);
         setSingle(isSingleGuest(found));
-        setName(found.name);
+        // En las familias se edita solo el apellido; "Familia" va fijo en el campo.
+        setName(isSingleGuest(found) ? found.name : familySurname(found.name));
         setPhone(found.phone ?? '');
         setPeople(found.guests.map((guest) => ({ key: guest.id, id: guest.id, name: guest.name })));
       })
-      .catch((error) => setLoadError(errorMessage(error, 'No pudimos cargar el grupo.')))
+      .catch((error) => setLoadError(errorMessage(error, 'No pudimos cargar la familia.')))
       .finally(() => setLoading(false));
   }, [groupId]);
 
@@ -129,8 +130,8 @@ export function useEditGuestGroup(groupId: string, onDone: () => void) {
 
   function validate() {
     const errors: FieldErrors = {};
-    if (!name.trim()) {
-      errors.name = single ? 'Escribí el nombre y apellido.' : 'Escribí el nombre del grupo.';
+    if (single ? !name.trim() : !familySurname(name)) {
+      errors.name = single ? 'Escribí el nombre y apellido.' : 'Escribí el apellido de la familia.';
     }
     if (phone.trim() && !isValidPhone(phone.trim())) {
       errors.phone = 'Revisá el WhatsApp: escribí solo números, con el código de área.';
@@ -153,7 +154,7 @@ export function useEditGuestGroup(groupId: string, onDone: () => void) {
     setSaving(true);
     try {
       await updateGuestGroup(group.id, {
-        name: name.trim(),
+        name: single ? name.trim() : familyName(name),
         phone: phone.trim() || null,
         guests: single
           ? [{ id: group.guests[0].id, name: name.trim() }]
@@ -178,7 +179,7 @@ export function useEditGuestGroup(groupId: string, onDone: () => void) {
       await deleteGuestGroup(group.id);
       onDone();
     } catch (error) {
-      setFormError(errorMessage(error, 'No pudimos borrar el grupo. Intentá de nuevo.'));
+      setFormError(errorMessage(error, 'No pudimos borrar la familia. Intentá de nuevo.'));
       setDeleting(false);
     }
   }

@@ -9,12 +9,13 @@ import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
 import { AddMode, useAddGuestGroup } from '../../controllers/useAddGuestGroup';
+import { FAMILY_PREFIX } from '../../models/Guest';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
 
 const MODES: { value: AddMode; label: string }[] = [
   { value: 'single', label: 'Una persona' },
-  { value: 'group', label: 'Grupo o familia' },
+  { value: 'group', label: 'Familia' },
 ];
 
 // Pantalla sin diseño propio: sigue el estilo de Crear evento.
@@ -29,7 +30,7 @@ export default function AgregarInvitadosScreen() {
         <View style={styles.footer}>
           <FormError message={form.formError} />
           <Button
-            title={form.mode === 'single' ? 'Guardar invitado' : 'Guardar grupo'}
+            title={form.mode === 'single' ? 'Guardar invitado' : 'Guardar familia'}
             loading={form.loading}
             onPress={form.handleSave}
           />
@@ -43,7 +44,7 @@ export default function AgregarInvitadosScreen() {
       <Text style={text.body}>
         {form.mode === 'single'
           ? 'La persona recibe su propio link para ver la invitación y confirmar.'
-          : 'El grupo recibe un solo link y confirma una sola vez por todos.'}
+          : 'La familia recibe un solo link y confirma una sola vez por todos.'}
       </Text>
 
       <View style={styles.fields}>
@@ -60,8 +61,9 @@ export default function AgregarInvitadosScreen() {
           />
         ) : (
           <TextField
-            label="Nombre del grupo"
-            placeholder="Ej: Familia [Apellido]"
+            label="Apellido de la familia"
+            prefix={FAMILY_PREFIX}
+            placeholder="[Apellido]"
             value={form.name}
             onChangeText={form.setName}
             error={form.fieldErrors.name}
