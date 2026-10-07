@@ -1,14 +1,17 @@
 import { useTemplateId } from '../controllers/TemplateContext';
 import { HeartLogo } from './HeartLogo';
-import { DecoDivider } from './TemplateDecor';
+import { BowDivider, DecoDivider } from './TemplateDecor';
 
-// Separador de secciones, según la plantilla: línea con el corazón (Dorado y Rosa), línea con
-// rombos art déco (Noche azul) o una línea fina sola (Minimalista).
+// Separador de secciones, según la plantilla: línea con el corazón (Dorado), con un moño de
+// cinta (Rosa), con rombos art déco (Noche azul) o una línea fina sola (Minimalista).
 export function Ornament() {
   const template = useTemplateId();
 
   if (template === 'noche') {
     return <DecoDivider />;
+  }
+  if (template === 'rosa') {
+    return <BowDivider />;
   }
   if (template === 'minimal') {
     return <span className="block h-px w-full bg-gold/50" />;

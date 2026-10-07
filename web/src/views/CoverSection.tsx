@@ -1,4 +1,4 @@
-import { DecoDivider, DecoFan, NightStars } from '../components/TemplateDecor';
+import { BowDivider, DecoDivider, DecoFan, NightStars } from '../components/TemplateDecor';
 import { Invitation } from '../models/Invitation';
 import { TemplateId } from '../models/Template';
 import { coupleInitials, splitCoupleNames } from '../utils/names';
@@ -61,7 +61,8 @@ function DoradoCover({ invitation, photos }: { invitation: Invitation; photos: s
   );
 }
 
-// Rosa romántico: una foto grande con el borde de abajo redondeado y una tarjeta encima.
+// Rosa romántico: una foto grande con el borde de abajo redondeado y una tarjeta encima,
+// con un moño de cinta entre los nombres y "¡Nos casamos!".
 function RosaCover({ invitation, photo }: { invitation: Invitation; photo?: string }) {
   return (
     <header className="relative bg-bg text-ink">
@@ -77,6 +78,9 @@ function RosaCover({ invitation, photo }: { invitation: Invitation; photo?: stri
       <div className="wrap relative z-[2] -mt-[150px] pb-14">
         <div className="card flex flex-col items-center gap-3.5 px-[22px] py-8 text-center outline-1 -outline-offset-[9px] outline-gold">
           <CoupleNames invitation={invitation} nameClass="text-ink" />
+          <div className="mt-2 w-full">
+            <BowDivider width={200} />
+          </div>
           <Headline casamosClass="text-accent" subtitleClass="text-muted" />
           <GuestPill invitation={invitation} className="text-ink" />
         </div>

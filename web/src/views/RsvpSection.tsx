@@ -1,4 +1,4 @@
-import { DecoFan, NightStars } from '../components/TemplateDecor';
+import { BowDivider, DecoFan, NightStars } from '../components/TemplateDecor';
 import { useTemplateId } from '../controllers/TemplateContext';
 import { RsvpController } from '../controllers/useRsvp';
 import { Invitation } from '../models/Invitation';
@@ -37,7 +37,8 @@ function answerSummary(invitation: Invitation) {
 // formulario en un panel. Si ya respondieron, un resumen de una línea y "Cambiar mi respuesta".
 export function RsvpSection({ invitation, rsvp }: Props) {
   const { event } = invitation;
-  const noche = useTemplateId() === 'noche';
+  const template = useTemplateId();
+  const noche = template === 'noche';
   const deadline = event.rsvpDeadline ? dayAndMonth(event.rsvpDeadline) : null;
 
   let intro: string;
@@ -57,6 +58,11 @@ export function RsvpSection({ invitation, rsvp }: Props) {
           {noche && (
             <div className="mb-4">
               <DecoFan width={100} />
+            </div>
+          )}
+          {template === 'rosa' && (
+            <div className="mb-4">
+              <BowDivider width={200} />
             </div>
           )}
           <div className="eyebrow text-gold">Confirmación de asistencia</div>
