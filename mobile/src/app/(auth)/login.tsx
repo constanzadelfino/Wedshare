@@ -5,10 +5,12 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { FooterLink } from '../../components/FooterLink';
 import { FormError } from '../../components/FormError';
+import { GoogleLogo } from '../../components/GoogleLogo';
 import { Logo } from '../../components/Logo';
 import { OrDivider } from '../../components/OrDivider';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
+import { useGoogleSignIn } from '../../controllers/useGoogleSignIn';
 import { useLogin } from '../../controllers/useLogin';
 import { colors } from '../../theme/colors';
 import { fonts, text } from '../../theme/typography';
@@ -16,6 +18,7 @@ import { fonts, text } from '../../theme/typography';
 export default function LoginScreen() {
   const { email, setEmail, password, setPassword, fieldErrors, formError, loading, handleLogin } =
     useLogin();
+  const { googleError, googleLoading, handleGoogle } = useGoogleSignIn();
   const passwordRef = useRef<TextInput>(null);
 
   return (
@@ -68,10 +71,17 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.actions}>
-        <FormError message={formError} />
-        <Button title="Ingresar" loading={loading} onPress={handleLogin} />
+        <FormError message={formError ?? googleError} />
+        <Button title="Ingresar" loading={loading} disabled={googleLoading} onPress={handleLogin} />
         <OrDivider />
-        <Button title="Continuar con Google" variant="secondary" disabled={loading} />
+        <Button
+          title="Continuar con Google"
+          variant="secondary"
+          loading={googleLoading}
+          disabled={loading}
+          onPress={handleGoogle}
+          icon={<GoogleLogo />}
+        />
       </View>
     </Screen>
   );

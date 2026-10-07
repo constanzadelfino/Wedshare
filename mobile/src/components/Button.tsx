@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import { ReactNode } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors } from '../theme/colors';
 import { radius, text } from '../theme/typography';
@@ -10,9 +11,18 @@ type Props = {
   variant?: 'primary' | 'secondary' | 'outline';
   loading?: boolean;
   disabled?: boolean;
+  // Ícono a la izquierda del texto, como la "G" de "Continuar con Google".
+  icon?: ReactNode;
 };
 
-export function Button({ title, onPress, variant = 'primary', loading = false, disabled = false }: Props) {
+export function Button({
+  title,
+  onPress,
+  variant = 'primary',
+  loading = false,
+  disabled = false,
+  icon,
+}: Props) {
   const isPrimary = variant === 'primary';
   const isDisabled = disabled || loading;
   const textColor = isPrimary ? colors.card : variant === 'outline' ? colors.accentText : colors.text;
@@ -34,7 +44,10 @@ export function Button({ title, onPress, variant = 'primary', loading = false, d
       {loading ? (
         <ActivityIndicator color={isPrimary ? colors.card : colors.accent} />
       ) : (
-        <Text style={[text.button, { color: textColor }]}>{title}</Text>
+        <View style={styles.content}>
+          {icon}
+          <Text style={[text.button, { color: textColor }]}>{title}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -47,6 +60,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   primary: {
     backgroundColor: colors.accent,

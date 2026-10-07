@@ -4,10 +4,12 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { Button } from '../../components/Button';
 import { FooterLink } from '../../components/FooterLink';
 import { FormError } from '../../components/FormError';
+import { GoogleLogo } from '../../components/GoogleLogo';
 import { OrDivider } from '../../components/OrDivider';
 import { Screen } from '../../components/Screen';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { TextField } from '../../components/TextField';
+import { useGoogleSignIn } from '../../controllers/useGoogleSignIn';
 import { useSignUp } from '../../controllers/useSignUp';
 import { text } from '../../theme/typography';
 
@@ -24,6 +26,7 @@ export default function RegistroScreen() {
     loading,
     handleSignUp,
   } = useSignUp();
+  const { googleError, googleLoading, handleGoogle } = useGoogleSignIn();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
 
@@ -85,10 +88,17 @@ export default function RegistroScreen() {
       </View>
 
       <View style={styles.actions}>
-        <FormError message={formError} />
-        <Button title="Crear cuenta" loading={loading} onPress={handleSignUp} />
+        <FormError message={formError ?? googleError} />
+        <Button title="Crear cuenta" loading={loading} disabled={googleLoading} onPress={handleSignUp} />
         <OrDivider />
-        <Button title="Continuar con Google" variant="secondary" disabled={loading} />
+        <Button
+          title="Continuar con Google"
+          variant="secondary"
+          loading={googleLoading}
+          disabled={loading}
+          onPress={handleGoogle}
+          icon={<GoogleLogo />}
+        />
       </View>
     </Screen>
   );
