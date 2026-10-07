@@ -48,6 +48,7 @@ function toEventData(event: Event): EventData {
     storyPhotoUrl: storage && event.storyPhoto ? publicPhotoUrl(storage, event.storyPhoto) : null,
     albumPhotoUrls: storage ? event.albumPhotos.map((path) => publicPhotoUrl(storage, path)) : [],
     closingPhrase: event.closingPhrase,
+    template: event.template,
   };
 }
 

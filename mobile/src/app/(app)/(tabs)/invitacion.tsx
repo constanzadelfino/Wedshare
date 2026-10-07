@@ -10,6 +10,7 @@ import { QuickAction, quickActionIconProps } from '../../../components/QuickActi
 import { Screen } from '../../../components/Screen';
 import { useInvitationPreview } from '../../../controllers/useInvitationPreview';
 import { useMyEvent } from '../../../controllers/useMyEvent';
+import { TEMPLATES } from '../../../models/Template';
 import { colors } from '../../../theme/colors';
 import { text } from '../../../theme/typography';
 
@@ -40,10 +41,23 @@ export default function InvitacionScreen() {
       ) : (
         <>
           <Text style={text.body}>Así la ven tus invitados cuando abren su link.</Text>
-          <Button title="Ver mi invitación" loading={preview.opening} onPress={preview.openPreview} />
+          <Button title="Ver mi invitación" loading={preview.opening} onPress={() => preview.openPreview()} />
           <FormError message={preview.error} />
 
           <View style={styles.list}>
+            <QuickAction
+              title="Plantilla"
+              description={TEMPLATES.find((template) => template.id === event.template)?.name ?? 'Elegí el estilo'}
+              onPress={() => router.push('/plantilla')}
+              icon={
+                <Svg {...quickActionIconProps}>
+                  <Rect x={3} y={3} width={7} height={9} rx={1} />
+                  <Rect x={14} y={3} width={7} height={5} rx={1} />
+                  <Rect x={14} y={12} width={7} height={9} rx={1} />
+                  <Rect x={3} y={16} width={7} height={5} rx={1} />
+                </Svg>
+              }
+            />
             <QuickAction
               title="Datos del casamiento"
               description="Nombre, fecha y lugar"

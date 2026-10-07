@@ -1,3 +1,5 @@
+import { TemplateId } from './Template';
+
 // Un casamiento, tal como lo devuelve la API.
 export type Event = {
   id: string;
@@ -32,6 +34,8 @@ export type Event = {
   storyPhotoUrl: string | null;
   albumPhotoUrls: string[];
   closingPhrase: string | null;
+  // Plantilla de la invitación.
+  template: TemplateId;
 };
 
 export type NewEvent = Pick<

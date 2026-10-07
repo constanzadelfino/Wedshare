@@ -1,3 +1,7 @@
+// Plantillas de la invitación: Dorado clásico, Rosa romántico, Noche azul y Minimalista.
+export const TEMPLATES = ['dorado', 'rosa', 'noche', 'minimal'] as const;
+export type TemplateId = (typeof TEMPLATES)[number];
+
 // Datos de un evento tal como los manda y los recibe la app.
 // La tabla en sí está definida en prisma/schema.prisma.
 export type EventData = {
@@ -34,6 +38,8 @@ export type EventData = {
   storyPhotoUrl: string | null;
   albumPhotoUrls: string[];
   closingPhrase: string | null;
+  // Plantilla de la invitación.
+  template: TemplateId;
 };
 
 // Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
@@ -167,6 +173,13 @@ export function validateEventInput(body: unknown, partial: boolean): ValidationR
       }
       data.spotifyPlaylistUrl = url;
     }
+  }
+
+  if (input.template !== undefined) {
+    if (typeof input.template !== 'string' || !(TEMPLATES as readonly string[]).includes(input.template)) {
+      return { error: 'Elegí una de las plantillas.' };
+    }
+    data.template = input.template as TemplateId;
   }
 
   if (input.rsvpDeadline !== undefined) {

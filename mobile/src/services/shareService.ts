@@ -1,6 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { Linking, Share } from 'react-native';
 
+import { TemplateId } from '../models/Template';
 import { toWhatsAppNumber } from '../utils/phone';
 
 // Sin la barra final, para armar los links con una sola barra.
@@ -14,8 +15,13 @@ export function buildInviteLink(inviteToken: string) {
 }
 
 // Link de la vista previa de los novios (su invitación con una familia de ejemplo).
-export function buildPreviewLink(previewToken: string) {
-  return inviteBaseUrl ? `${inviteBaseUrl}/vista-previa/${previewToken}` : null;
+// Con una plantilla, la vista previa la muestra sin guardarla (para verla antes de elegirla).
+export function buildPreviewLink(previewToken: string, template?: TemplateId) {
+  if (!inviteBaseUrl) {
+    return null;
+  }
+  const link = `${inviteBaseUrl}/vista-previa/${previewToken}`;
+  return template ? `${link}?plantilla=${template}` : link;
 }
 
 // Abre un link en el navegador del celular.

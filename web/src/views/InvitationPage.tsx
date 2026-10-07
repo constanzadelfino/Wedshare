@@ -13,9 +13,11 @@ import { StatusScreen } from './StatusScreen';
 export function InvitationPage({ inviteToken, preview }: { inviteToken: string; preview: boolean }) {
   const { state, retry, replace } = useInvitation(inviteToken, preview);
   const opening = useOpening(inviteToken, !preview);
-  // Por ahora la plantilla solo se cambia en la vista previa, con ?plantilla=rosa|salvia|noche.
+  // La plantilla que eligieron los novios. En la vista previa, ?plantilla=rosa (o noche, minimal,
+  // dorado) muestra otra sin guardarla: la usa la app para ver cada plantilla antes de elegirla.
   const requested = preview ? new URLSearchParams(window.location.search).get('plantilla') : null;
-  const template = isTemplateId(requested) ? requested : DEFAULT_TEMPLATE;
+  const saved = state.status === 'ready' ? state.invitation.event.template : DEFAULT_TEMPLATE;
+  const template = isTemplateId(requested) ? requested : saved;
   useTemplate(template);
 
   if (state.status === 'loading') {

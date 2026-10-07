@@ -51,7 +51,7 @@ export default function PersonalizarScreen() {
                   title="Ver mi invitación"
                   variant="outline"
                   loading={preview.opening}
-                  onPress={preview.openPreview}
+                  onPress={() => preview.openPreview()}
                 />
               </View>
               <View style={styles.footerButton}>

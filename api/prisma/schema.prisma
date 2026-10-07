@@ -56,6 +56,9 @@ model Event {
   albumPhotos   String[] @default([]) @map("album_photos")
   closingPhrase String?  @map("closing_phrase")
 
+  // Plantilla de la invitación que eligieron los novios (colores, fuentes, portada y adornos).
+  template InvitationTemplate @default(dorado)
+
   // Link para que los novios vean su invitación con una familia de ejemplo.
   // Es distinto de los links de los invitados y se crea la primera vez que se pide.
   previewToken String? @unique @map("preview_token")
@@ -68,6 +71,16 @@ model Event {
   gifts       Gift[]
 
   @@map("events")
+}
+
+// Plantillas de la invitación: Dorado clásico, Rosa romántico, Noche azul y Minimalista.
+enum InvitationTemplate {
+  dorado
+  rosa
+  noche
+  minimal
+
+  @@map("invitation_template")
 }
 
 // Tipo de cada parte del casamiento. Hay como máximo una de cada una por casamiento.

@@ -1,3 +1,4 @@
+import { TemplateId } from './event';
 import { EventItemKind } from './eventItem';
 import { GiftData } from './gift';
 import { GuestStatus } from './guest';
@@ -53,6 +54,8 @@ export type InvitationData = {
     // Direcciones públicas de las fotos del álbum, en orden.
     albumPhotoUrls: string[];
     closingPhrase: string | null;
+    // Plantilla de la invitación: dorado, rosa, noche o minimal.
+    template: TemplateId;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: {
       // null si no cargaron ningún dato de la cuenta.

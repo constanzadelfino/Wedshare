@@ -1,3 +1,5 @@
+import { TemplateId } from './Template';
+
 // Datos de la invitación tal como los manda la API (GET /invitations/:token).
 
 export type GuestStatus = 'pending' | 'confirmed' | 'declined';
@@ -97,6 +99,8 @@ export type Invitation = {
     albumPhotoUrls: string[];
     // Frase final de los novios, en el cierre.
     closingPhrase: string | null;
+    // Plantilla que eligieron los novios.
+    template: TemplateId;
     // Sección Regalos. null si los novios la apagaron o no cargaron nada.
     gifts: InvitationGifts | null;
   };
