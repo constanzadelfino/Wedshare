@@ -36,7 +36,7 @@ export default function InvitacionScreen() {
       ) : !event ? (
         <>
           <Text style={text.body}>Primero creá tu evento para armar la invitación.</Text>
-          <Button title="Crear evento" onPress={() => router.push('/crear-evento')} />
+          <Button title="Crear evento" onPress={() => router.push('/primeros-pasos')} />
         </>
       ) : (
         <>

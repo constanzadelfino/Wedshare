@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { Event } from '../models/Event';
@@ -11,8 +10,9 @@ function errorMessage(error: unknown, fallback: string) {
 }
 
 // Lógica de "Elegí una plantilla": se marca una, se puede ver la vista previa con esa plantilla
-// sin guardarla, y "Usar plantilla" la guarda y vuelve.
-export function useChooseTemplate() {
+// sin guardarla, y "Usar plantilla" la guarda. onDone dice qué pasa después (volver, o seguir
+// con el onboarding).
+export function useChooseTemplate(onDone: () => void) {
   const [event, setEvent] = useState<Event | null>(null);
   const [selected, setSelected] = useState<TemplateId>('dorado');
   const [loading, setLoading] = useState(true);
@@ -38,14 +38,14 @@ export function useChooseTemplate() {
       return;
     }
     if (selected === event.template) {
-      router.back();
+      onDone();
       return;
     }
     setError(undefined);
     setSaving(true);
     try {
       await updateEvent(event.id, { template: selected });
-      router.back();
+      onDone();
     } catch (reason) {
       setError(errorMessage(reason, 'No pudimos guardar la plantilla. Intentá de nuevo.'));
       setSaving(false);

@@ -1,8 +1,7 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
-import { Button } from '../../../components/Button';
 import { FormError } from '../../../components/FormError';
 import { Logo } from '../../../components/Logo';
 import { QuickAction, quickActionIconProps } from '../../../components/QuickAction';
@@ -10,7 +9,7 @@ import { Screen } from '../../../components/Screen';
 import { GuestCounts, useHome } from '../../../controllers/useHome';
 import { useInvitationPreview } from '../../../controllers/useInvitationPreview';
 import { colors } from '../../../theme/colors';
-import { fonts, text } from '../../../theme/typography';
+import { fonts } from '../../../theme/typography';
 import { isoDateToLongDisplay } from '../../../utils/date';
 
 // Inicio (pantalla 03 del diseño): cuenta regresiva, confirmaciones y accesos rápidos.
@@ -25,13 +24,8 @@ export default function InicioScreen() {
       ) : home.error ? (
         <FormError message={home.error} />
       ) : !home.event ? (
-        <>
-          <Header title="Tu casamiento" />
-          <Text style={text.body}>
-            Todavía no creaste tu evento. Empezá por cargar el nombre, la fecha y el lugar.
-          </Text>
-          <Button title="Crear evento" onPress={() => router.push('/crear-evento')} />
-        </>
+        // Sin casamiento todavía (por ejemplo, recién registrados): los primeros pasos.
+        <Redirect href="/primeros-pasos" />
       ) : (
         <>
           <Header

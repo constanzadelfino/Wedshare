@@ -41,7 +41,8 @@ export type Event = {
 export type NewEvent = Pick<
   Event,
   'name' | 'date' | 'venue' | 'calendarSync' | 'playlistEnabled' | 'giftsEnabled'
->;
+> &
+  Partial<Pick<Event, 'coupleNames'>>;
 
 // Lo que se puede cambiar desde Personalizar. Las fotos se suben aparte.
 export type EventChanges = Partial<Omit<Event, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls'>>;

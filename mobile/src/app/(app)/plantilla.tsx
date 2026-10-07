@@ -1,3 +1,4 @@
+import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
@@ -14,8 +15,11 @@ import { fonts, text } from '../../theme/typography';
 
 // Elegí una plantilla (pantalla 09 del diseño, sin los filtros por estilo: con cuatro plantillas
 // no hacen falta). "Vista previa" muestra la invitación con la plantilla marcada sin guardarla.
+// Con ?inicio=1 es el paso 2 de los primeros pasos: sin volver, con "Elegir después".
 export default function PlantillaScreen() {
-  const choose = useChooseTemplate();
+  const onboarding = useLocalSearchParams<{ inicio?: string }>().inicio === '1';
+  const finishOnboarding = () => router.replace('/invitacion-lista');
+  const choose = useChooseTemplate(onboarding ? finishOnboarding : () => router.back());
   const preview = useInvitationPreview(choose.event?.id);
 
   return (
@@ -40,11 +44,25 @@ export default function PlantillaScreen() {
                 <Button title="Usar plantilla" loading={choose.saving} onPress={choose.saveTemplate} />
               </View>
             </View>
+            {onboarding ? (
+              <Pressable onPress={finishOnboarding} accessibilityRole="button" style={styles.later}>
+                <Text style={text.link}>Elegir después</Text>
+              </Pressable>
+            ) : null}
           </View>
         ) : null
       }
     >
-      <ScreenHeader title="Tu invitación" showLogo={false} />
+      {onboarding ? (
+        <View style={styles.onboardingHeader}>
+          <Text style={styles.step}>Paso 2 de 2</Text>
+          <Text style={styles.title} accessibilityRole="header">
+            Elegí una plantilla
+          </Text>
+        </View>
+      ) : (
+        <ScreenHeader title="Tu invitación" showLogo={false} />
+      )}
 
       {choose.loading ? (
         <ActivityIndicator color={colors.accent} />
@@ -52,7 +70,11 @@ export default function PlantillaScreen() {
         <FormError message={choose.loadError} />
       ) : (
         <>
-          <Text style={text.body}>Elegí una plantilla. Después podés cambiar fotos y textos.</Text>
+          <Text style={text.body}>
+            {onboarding
+              ? 'Después podés cambiarla, y también las fotos y los textos.'
+              : 'Elegí una plantilla. Después podés cambiar fotos y textos.'}
+          </Text>
           <View style={styles.grid} accessibilityRole="radiogroup">
             {TEMPLATES.map((template) => (
               <TemplateCard
@@ -165,6 +187,30 @@ const styles = StyleSheet.create({
   footer: {
     width: '100%',
     gap: 10,
+  },
+  later: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  onboardingHeader: {
+    gap: 8,
+  },
+  step: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 13,
+    letterSpacing: 1.8,
+    textTransform: 'uppercase',
+    color: colors.accentText,
+  },
+  title: {
+    fontFamily: fonts.extraBold,
+    fontStyle: 'normal',
+    fontSize: 30,
+    lineHeight: 34,
+    letterSpacing: -0.4,
+    color: colors.text,
   },
   footerRow: {
     flexDirection: 'row',
