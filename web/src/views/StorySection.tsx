@@ -14,14 +14,14 @@ export function StorySection({ story }: { story: Story }) {
         {story.title ? (
           <SectionTitle eyebrow="Nuestra historia" title={story.title} />
         ) : (
-          <div className="text-center">
+          <div className="tpl-align">
             <h2 className="h2 text-ink">Nuestra historia</h2>
           </div>
         )}
         <div className="h-5" />
         <div className="mx-auto flex max-w-[900px] flex-col items-center gap-x-10 gap-y-7 md:flex-row">
           {story.photoUrl && (
-            <div className="mx-auto my-2 aspect-[4/5] w-[260px] shrink-0 rounded-[999px_999px_18px_18px] border-[1.5px] border-gold p-2 outline-1 outline-offset-[7px] outline-gold">
+            <div className="photo-frame mx-auto my-2 aspect-[4/5] w-[260px] shrink-0 rounded-[999px_999px_18px_18px] border-[1.5px] border-gold p-2 outline-1 outline-offset-[7px] outline-gold">
               <img
                 src={story.photoUrl}
                 alt="Foto de los novios"

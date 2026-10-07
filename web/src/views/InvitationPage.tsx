@@ -1,5 +1,8 @@
+import { TemplateContext } from '../controllers/TemplateContext';
 import { useInvitation } from '../controllers/useInvitation';
 import { useOpening } from '../controllers/useOpening';
+import { useTemplate } from '../controllers/useTemplate';
+import { DEFAULT_TEMPLATE, isTemplateId } from '../models/Template';
 import { coupleInitials } from '../utils/names';
 import { InvitationView } from './InvitationView';
 import { OpeningScreen } from './OpeningScreen';
@@ -10,6 +13,10 @@ import { StatusScreen } from './StatusScreen';
 export function InvitationPage({ inviteToken, preview }: { inviteToken: string; preview: boolean }) {
   const { state, retry, replace } = useInvitation(inviteToken, preview);
   const opening = useOpening(inviteToken, !preview);
+  // Por ahora la plantilla solo se cambia en la vista previa, con ?plantilla=rosa|salvia|noche.
+  const requested = preview ? new URLSearchParams(window.location.search).get('plantilla') : null;
+  const template = isTemplateId(requested) ? requested : DEFAULT_TEMPLATE;
+  useTemplate(template);
 
   if (state.status === 'loading') {
     return <StatusScreen title="Cargando tu invitación" />;
@@ -19,13 +26,18 @@ export function InvitationPage({ inviteToken, preview }: { inviteToken: string; 
   }
 
   return (
-    <>
+    <TemplateContext.Provider value={template}>
       {preview && (
         <div className="sticky top-0 z-30 bg-dark px-4 py-2.5 text-center text-sm font-semibold text-bg">
           Vista previa: así ven la invitación tus invitados.
         </div>
       )}
-      <InvitationView inviteToken={inviteToken} invitation={state.invitation} onChange={replace} />
+      <InvitationView
+        inviteToken={inviteToken}
+        invitation={state.invitation}
+        onChange={replace}
+        template={template}
+      />
       {opening.phase !== 'open' && (
         <OpeningScreen
           initials={coupleInitials(state.invitation.event.coupleNames)}
@@ -33,6 +45,6 @@ export function InvitationPage({ inviteToken, preview }: { inviteToken: string; 
           onOpen={opening.open}
         />
       )}
-    </>
+    </TemplateContext.Provider>
   );
 }

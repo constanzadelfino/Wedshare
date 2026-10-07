@@ -1,5 +1,6 @@
 import { useRsvp } from '../controllers/useRsvp';
 import { Invitation } from '../models/Invitation';
+import { TemplateId } from '../models/Template';
 import { argentinaTime } from '../utils/dates';
 import { googleCalendarUrl } from '../utils/calendar';
 import { AlbumSection } from './AlbumSection';
@@ -21,6 +22,7 @@ type Props = {
   inviteToken: string;
   invitation: Invitation;
   onChange: (invitation: Invitation) => void;
+  template: TemplateId;
 };
 
 // Lleva la pantalla a una sección, después de que se cierre lo que esté encima.
@@ -28,7 +30,7 @@ function scrollToSection(id: string) {
   requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }));
 }
 
-export function InvitationView({ inviteToken, invitation, onChange }: Props) {
+export function InvitationView({ inviteToken, invitation, onChange, template }: Props) {
   const { event } = invitation;
   const rsvp = useRsvp(inviteToken, invitation, onChange);
 
@@ -50,7 +52,7 @@ export function InvitationView({ inviteToken, invitation, onChange }: Props) {
 
   return (
     <main className="w-full bg-bg font-sans text-ink">
-      <CoverSection invitation={invitation} />
+      <CoverSection invitation={invitation} template={template} />
       {event.welcomeMessage && <WelcomeSection message={event.welcomeMessage} />}
       <DateSection date={event.date} start={start} calendarUrl={calendarUrl} />
       {event.items.length > 0 && <EventsSection items={event.items} weddingDate={event.date} />}

@@ -23,22 +23,22 @@ export function DateSection({ date, start, calendarUrl }: Props) {
 
   return (
     <section id="fecha" className="sec">
-      <div className="wrap text-center">
+      <div className="wrap tpl-align">
         <SectionTitle eyebrow="Agendá la fecha" title={dayAndMonth(date)} />
         <div
-          className="mt-5 mb-7 flex justify-center gap-1.5 min-[390px]:gap-2"
+          className="countdown mt-5 mb-7 flex justify-center gap-1.5 min-[390px]:gap-2"
           role="timer"
           aria-label={`Faltan ${days} días, ${hours} horas y ${minutes} minutos`}
         >
           {units.map((unit, index) => (
             <Fragment key={unit.label}>
               {index > 0 && (
-                <span className="self-center font-display text-[28px] text-gold" aria-hidden="true">
+                <span className="countdown-sep self-center font-display text-[28px] text-gold" aria-hidden="true">
                   :
                 </span>
               )}
               <div
-                className="flex min-w-[60px] flex-col items-center gap-0.5 rounded-[14px] border border-gold px-2 py-3 min-[390px]:min-w-[68px]"
+                className="countdown-box flex min-w-[60px] flex-col items-center gap-0.5 rounded-[14px] border border-gold px-2 py-3 min-[390px]:min-w-[68px]"
                 aria-hidden="true"
               >
                 <span className="font-display text-[28px] leading-none font-light text-ink tabular-nums">

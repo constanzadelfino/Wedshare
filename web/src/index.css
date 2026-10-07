@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 /*
- * Colores de la plantilla. Hoy es Dorado clásico; las otras plantillas van a cambiar
- * estas variables (y la fuente de títulos) sin tocar las secciones.
+ * Colores de la plantilla. Por defecto, Dorado clásico; las otras plantillas cambian
+ * estas variables (y la fuente de títulos) según data-template en el <html>.
  */
 :root {
   --tpl-accent: #7a5b22;
@@ -11,10 +11,60 @@
   --tpl-bg: #f7f1e6;
   --tpl-ink: #2e2418;
   --tpl-card: #fffdf8;
-  /* Fondo y texto de la pantalla de apertura (el sobre). */
+  /* Pantalla de apertura (el sobre): fondo, solapa, sombra de la solapa y textos. */
   --tpl-envelope: #efe5d1;
+  --tpl-envelope-flap: #fffdf8;
+  --tpl-envelope-shadow: rgba(46, 36, 24, 0.1);
+  --tpl-envelope-ink: #2e2418;
   --tpl-envelope-text: #6b5a44;
   --tpl-font-display: 'Figtree', sans-serif;
+}
+
+/* Rosa romántico: rosado y borravino, títulos en Gilda Display. */
+:root[data-template='rosa'] {
+  --tpl-accent: #8f3f52;
+  --tpl-gold: #d4958f;
+  --tpl-dark: #4a2230;
+  --tpl-bg: #fbf1ee;
+  --tpl-ink: #3b1f26;
+  --tpl-envelope: #f3ddd8;
+  --tpl-envelope-flap: #fff5f2;
+  --tpl-envelope-shadow: rgba(74, 34, 48, 0.1);
+  --tpl-envelope-ink: #3b1f26;
+  --tpl-envelope-text: #7a4f5a;
+  --tpl-font-display: 'Gilda Display', serif;
+}
+
+/* Noche azul: azul noche y oro, títulos en Josefin Sans. El sobre es oscuro. */
+:root[data-template='noche'] {
+  --tpl-accent: #7a5b22;
+  --tpl-gold: #d9b873;
+  --tpl-dark: #1b2740;
+  --tpl-bg: #f4f2ec;
+  --tpl-ink: #1b2236;
+  --tpl-envelope: #16203a;
+  --tpl-envelope-flap: #223250;
+  --tpl-envelope-shadow: rgba(0, 0, 0, 0.25);
+  --tpl-envelope-ink: #f4f2ec;
+  --tpl-envelope-text: #b9c2d8;
+  --tpl-font-display: 'Josefin Sans', sans-serif;
+}
+
+/* Minimalista: blanco y negro, títulos en Jost, sin adornos. */
+:root[data-template='minimal'] {
+  --tpl-accent: #111111;
+  --tpl-gold: #8c8c8c;
+  --tpl-dark: #111111;
+  --tpl-bg: #ffffff;
+  --tpl-ink: #111111;
+  --tpl-card: #ffffff;
+  --tpl-soft: #f4f4f4;
+  --tpl-envelope: #efefef;
+  --tpl-envelope-flap: #ffffff;
+  --tpl-envelope-shadow: rgba(0, 0, 0, 0.08);
+  --tpl-envelope-ink: #111111;
+  --tpl-envelope-text: #6b6b6b;
+  --tpl-font-display: 'Jost', sans-serif;
 }
 
 @theme inline {
@@ -29,11 +79,14 @@
   --color-card: var(--tpl-card);
   --color-envelope: var(--tpl-envelope);
   --color-envelope-text: var(--tpl-envelope-text);
+  --color-envelope-flap: var(--tpl-envelope-flap);
+  --color-envelope-shadow: var(--tpl-envelope-shadow);
+  --color-envelope-ink: var(--tpl-envelope-ink);
   /* Tonos derivados, igual que en el diseño. */
   --color-muted: color-mix(in srgb, var(--tpl-ink) 72%, var(--tpl-bg));
   --color-mdark: color-mix(in srgb, var(--tpl-bg) 78%, var(--tpl-dark));
   --color-line: color-mix(in srgb, var(--tpl-ink) 14%, var(--tpl-bg));
-  --color-soft: color-mix(in srgb, var(--tpl-accent) 10%, var(--tpl-bg));
+  --color-soft: var(--tpl-soft, color-mix(in srgb, var(--tpl-accent) 10%, var(--tpl-bg)));
 
   --shadow-card: 0 14px 34px rgba(46, 36, 24, 0.08);
 }
@@ -173,6 +226,156 @@
       font-size: 58px;
     }
   }
+
+  /* Títulos de cada plantilla (tamaños y espaciado del diseño). */
+  [data-template='rosa'] .h2 {
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  [data-template='rosa'] .names {
+    font-size: 46px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  [data-template='noche'] .h2 {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  [data-template='noche'] .names {
+    font-size: 34px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+  }
+  [data-template='minimal'] .h2 {
+    font-weight: 300;
+    letter-spacing: 0;
+  }
+  [data-template='minimal'] .names {
+    font-size: 56px;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  @media (min-width: 760px) {
+    [data-template='rosa'] .names {
+      font-size: 76px;
+    }
+    [data-template='noche'] .h2 {
+      font-size: 38px;
+    }
+    [data-template='noche'] .names {
+      font-size: 54px;
+    }
+    [data-template='minimal'] .names {
+      font-size: 84px;
+    }
+  }
+
+  /* Textos centrados que en Minimalista van alineados a la izquierda. */
+  .tpl-align {
+    text-align: center;
+  }
+}
+
+/*
+ * Formas de cada plantilla. Van fuera de las capas para ganarle a las clases de Tailwind.
+ * Noche azul y Minimalista tienen esquinas rectas (salvo los círculos).
+ */
+[data-template='noche'] [class*='rounded']:not([class*='rounded-full']),
+[data-template='minimal'] [class*='rounded']:not([class*='rounded-full']),
+[data-template='noche'] .btn,
+[data-template='minimal'] .btn,
+[data-template='noche'] .card,
+[data-template='minimal'] .card,
+[data-template='noche'] .field,
+[data-template='minimal'] .field {
+  border-radius: 0;
+}
+[data-template='noche'] .btn {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+[data-template='minimal'] .btn {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Cuenta regresiva: cajitas (Dorado y Rosa), doble marco (Noche) o números sueltos (Minimalista). */
+[data-template='rosa'] .countdown-box {
+  border-radius: 999px;
+  width: 68px;
+  height: 68px;
+  justify-content: center;
+}
+[data-template='noche'] .countdown-box {
+  min-width: 58px;
+  outline: 1px solid var(--color-gold);
+  outline-offset: 2px;
+  margin: 3px;
+}
+[data-template='minimal'] .countdown {
+  justify-content: flex-start;
+  gap: 22px;
+}
+[data-template='minimal'] .countdown-box {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  align-items: flex-start;
+}
+[data-template='minimal'] .countdown-box > :first-child {
+  font-size: 44px;
+}
+[data-template='minimal'] .countdown-box > :last-child {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-muted);
+}
+[data-template='minimal'] .countdown-sep {
+  display: none;
+}
+
+/* Minimalista: alineado a la izquierda. */
+[data-template='minimal'] .tpl-align {
+  text-align: left;
+  align-items: flex-start;
+}
+[data-template='minimal'] .tpl-align > .mx-auto,
+[data-template='minimal'] .tpl-align.mx-auto {
+  margin-left: 0;
+}
+/* Todas las secciones con el mismo ancho, así el borde izquierdo coincide. */
+[data-template='minimal'] .wrap {
+  max-width: 640px;
+}
+
+/* Fotos con marco: en Minimalista van sin marco y en blanco y negro. */
+[data-template='minimal'] .photo-frame {
+  border: 0;
+  outline: 0;
+  padding: 0;
+}
+[data-template='minimal'] .photo-frame img {
+  filter: grayscale(1);
+}
+
+/* Minimalista: el botón de confirmar es un rectángulo con borde blanco sobre negro. */
+[data-template='minimal'] #rsvp .btn {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+}
+[data-template='minimal'] .opening-seal {
+  background: #111111;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 /* Medias lunas del pase de ingreso: agujeros de verdad, así se ve el fondo a través. */

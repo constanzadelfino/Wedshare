@@ -33,10 +33,10 @@ export function QrSection({ invitation, onChangeAnswer }: Props) {
     <section id="qr" className="sec scroll-mt-4">
       <div className="wrap">
         <SectionTitle eyebrow="Tu acceso" title="Entrá sin hacer fila" />
-        <p className="mx-auto mt-0 mb-7 max-w-[560px] text-center text-[17px] leading-[1.55] text-muted">{intro}</p>
+        <p className="tpl-align mx-auto mt-0 mb-7 max-w-[560px] text-[17px] leading-[1.55] text-muted">{intro}</p>
 
         {/* La sombra va solo debajo del pase, así los costados de las medias lunas quedan limpios. */}
-        <div className="mx-auto max-w-[340px] text-center">
+        <div className="mx-auto max-w-[340px] text-center [[data-template=minimal]_&]:ml-0">
           <div className="flex flex-col items-center gap-1.5 rounded-t-[22px] border border-b-0 border-line bg-card px-6 pt-[26px] pb-[22px]">
             <div className="eyebrow m-0 text-accent">Pase de ingreso</div>
             <div className="font-display text-[20px] font-semibold">{pass.title}</div>

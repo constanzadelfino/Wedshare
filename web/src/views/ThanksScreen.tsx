@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react';
 import { HeartLogo } from '../components/HeartLogo';
 import { CheckIcon } from '../components/Icons';
 import { Ornament } from '../components/Ornament';
+import { NightStars } from '../components/TemplateDecor';
+import { useTemplateId } from '../controllers/TemplateContext';
 import { useBodyScrollLock } from '../controllers/useBodyScrollLock';
 import { Invitation } from '../models/Invitation';
 import { dayAndMonth } from '../utils/dates';
@@ -23,6 +25,7 @@ function personas(count: number) {
 // Si nadie del grupo asiste, cambia el texto y no muestra el pase.
 export function ThanksScreen({ invitation, calendarUrl, onShowPass, onChangeAnswer, onClose }: Props) {
   useBodyScrollLock();
+  const noche = useTemplateId() === 'noche';
   const { event, group } = invitation;
   const attendees = group.guests.filter((guest) => guest.status === 'confirmed');
   const attending = attendees.length > 0;
@@ -40,7 +43,8 @@ export function ThanksScreen({ invitation, calendarUrl, onShowPass, onChangeAnsw
       aria-labelledby="thanks-title"
       className="fixed inset-0 z-40 h-dvh overflow-y-auto bg-dark text-bg"
     >
-      <div className="mx-auto flex min-h-full max-w-[440px] flex-col items-center gap-4 px-7 pt-16 pb-12 text-center">
+      {noche && <NightStars />}
+      <div className="relative mx-auto flex min-h-full max-w-[440px] flex-col items-center gap-4 px-7 pt-16 pb-12 text-center">
         <div className="w-[240px]">
           <Ornament />
         </div>

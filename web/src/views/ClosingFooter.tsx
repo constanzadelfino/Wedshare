@@ -1,11 +1,15 @@
 import { HeartLogo } from '../components/HeartLogo';
+import { NightStars } from '../components/TemplateDecor';
+import { useTemplateId } from '../controllers/TemplateContext';
 import { Ornament } from '../components/Ornament';
 
 // Cierre de la invitación, con la frase final de los novios si la cargaron.
 export function ClosingFooter({ phrase }: { phrase: string | null }) {
+  const noche = useTemplateId() === 'noche';
   return (
-    <footer className="rounded-t-[44px] bg-dark pt-14 pb-9 text-bg">
-      <div className="wrap flex flex-col items-center gap-[18px] text-center">
+    <footer className="relative overflow-hidden rounded-t-[44px] bg-dark pt-14 pb-9 text-bg">
+      {noche && <NightStars />}
+      <div className="wrap relative flex flex-col items-center gap-[18px] text-center">
         <Ornament />
         {phrase && (
           <p className="m-0 max-w-[480px] font-display text-[28px] leading-[1.35] font-normal text-bg">

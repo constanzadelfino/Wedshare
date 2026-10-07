@@ -14,7 +14,7 @@ export function OpeningScreen({ initials, leaving, onOpen }: Props) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 h-dvh overflow-hidden bg-envelope text-ink ${leaving ? 'opening-leave' : ''}`}
+      className={`fixed inset-0 z-50 h-dvh overflow-hidden bg-envelope text-envelope-ink ${leaving ? 'opening-leave' : ''}`}
     >
       <svg
         className="opening-flap absolute inset-0 h-full w-full"
@@ -22,8 +22,8 @@ export function OpeningScreen({ initials, leaving, onOpen }: Props) {
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        <polygon points="0,0 100,0 50,56" fill="rgba(46,36,24,0.10)" transform="translate(0 1.6)" />
-        <polygon points="0,0 100,0 50,56" className="fill-card" />
+        <polygon points="0,0 100,0 50,56" className="fill-envelope-shadow" transform="translate(0 1.6)" />
+        <polygon points="0,0 100,0 50,56" className="fill-envelope-flap" />
         <polyline
           points="0,0 50,56 100,0"
           fill="none"

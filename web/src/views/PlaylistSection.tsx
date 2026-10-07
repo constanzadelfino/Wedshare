@@ -23,7 +23,7 @@ export function PlaylistSection({ url }: { url: string }) {
     <section id="playlist" className="sec">
       <div className="wrap max-w-[640px]">
         <SectionTitle eyebrow="Playlist" title="Armemos la fiesta juntos" />
-        <p className="mx-auto mt-0 mb-6 max-w-[520px] text-center text-[17px] leading-[1.55] text-muted">
+        <p className="tpl-align mx-auto mt-0 mb-6 max-w-[520px] text-[17px] leading-[1.55] text-muted">
           {collaborative
             ? 'Sumá las canciones que no pueden faltar. Se abre Spotify y las agregás a nuestra playlist.'
             : 'Estas son las canciones que elegimos para ese día, por si querés ir escuchándolas.'}
@@ -38,7 +38,7 @@ export function PlaylistSection({ url }: { url: string }) {
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           />
         )}
-        <div className="mt-5 text-center">
+        <div className="tpl-align mt-5">
           <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-solid">
             {collaborative ? 'Sumá tus canciones' : 'Abrir en Spotify'}
           </a>

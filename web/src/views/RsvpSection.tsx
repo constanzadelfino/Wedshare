@@ -1,3 +1,5 @@
+import { DecoFan, NightStars } from '../components/TemplateDecor';
+import { useTemplateId } from '../controllers/TemplateContext';
 import { RsvpController } from '../controllers/useRsvp';
 import { Invitation } from '../models/Invitation';
 import { dayAndMonth } from '../utils/dates';
@@ -35,6 +37,7 @@ function answerSummary(invitation: Invitation) {
 // formulario en un panel. Si ya respondieron, un resumen de una línea y "Cambiar mi respuesta".
 export function RsvpSection({ invitation, rsvp }: Props) {
   const { event } = invitation;
+  const noche = useTemplateId() === 'noche';
   const deadline = event.rsvpDeadline ? dayAndMonth(event.rsvpDeadline) : null;
 
   let intro: string;
@@ -47,9 +50,15 @@ export function RsvpSection({ invitation, rsvp }: Props) {
   }
 
   return (
-    <section id="rsvp" className="sec scroll-mt-4 bg-dark text-bg">
-      <div className="wrap">
-        <div className="mx-auto max-w-[560px] text-center">
+    <section id="rsvp" className="sec relative scroll-mt-4 overflow-hidden bg-dark text-bg">
+      {noche && <NightStars />}
+      <div className="wrap relative">
+        <div className="tpl-align mx-auto max-w-[560px]">
+          {noche && (
+            <div className="mb-4">
+              <DecoFan width={100} />
+            </div>
+          )}
           <div className="eyebrow text-gold">Confirmación de asistencia</div>
           <h2 className="h2 text-bg">Esperamos contar con tu presencia</h2>
           <p className="mx-auto mt-0 mb-7 text-[17px] leading-[1.55] text-mdark">{intro}</p>
