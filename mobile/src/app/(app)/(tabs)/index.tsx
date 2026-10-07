@@ -2,10 +2,12 @@ import { Redirect, router } from 'expo-router';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
+import { Button } from '../../../components/Button';
 import { FormError } from '../../../components/FormError';
 import { Logo } from '../../../components/Logo';
 import { QuickAction, quickActionIconProps } from '../../../components/QuickAction';
 import { Screen } from '../../../components/Screen';
+import { useShouldStartFirstSteps } from '../../../controllers/useFirstSteps';
 import { GuestCounts, useHome } from '../../../controllers/useHome';
 import { useInvitationPreview } from '../../../controllers/useInvitationPreview';
 import { colors } from '../../../theme/colors';
@@ -15,6 +17,7 @@ import { isoDateToLongDisplay } from '../../../utils/date';
 // Inicio (pantalla 03 del diseño): cuenta regresiva, confirmaciones y accesos rápidos.
 export default function InicioScreen() {
   const home = useHome();
+  const startFirstSteps = useShouldStartFirstSteps();
   const preview = useInvitationPreview(home.event?.id);
 
   return (
@@ -24,8 +27,23 @@ export default function InicioScreen() {
       ) : home.error ? (
         <FormError message={home.error} />
       ) : !home.event ? (
-        // Sin casamiento todavía (por ejemplo, recién registrados): los primeros pasos.
-        <Redirect href="/primeros-pasos" />
+        // Sin casamiento todavía (por ejemplo, recién registrados): los primeros pasos, o una
+        // tarjeta para retomarlos si los dejaron para más tarde.
+        startFirstSteps ? (
+          <Redirect href="/primeros-pasos" />
+        ) : (
+          <>
+            <Header title="Tu casamiento" />
+            <View style={styles.startCard}>
+              <Text style={styles.startTitle}>Armá tu invitación</Text>
+              <Text style={styles.startText}>
+                Contanos sus nombres, la fecha y el lugar, y elegí una plantilla. Son unos pocos
+                pasos.
+              </Text>
+              <Button title="Empezar" onPress={() => router.push('/primeros-pasos')} />
+            </View>
+          </>
+        )
       ) : (
         <>
           <Header
@@ -246,5 +264,26 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: 10,
+  },
+  startCard: {
+    gap: 12,
+    padding: 20,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 18,
+  },
+  startTitle: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 20,
+    color: colors.text,
+  },
+  startText: {
+    fontFamily: fonts.regular,
+    fontStyle: 'normal',
+    fontSize: 15,
+    lineHeight: 22,
+    color: colors.textSecondary,
   },
 });

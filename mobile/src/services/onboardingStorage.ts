@@ -17,3 +17,25 @@ export function markIntroSeen() {
     // Si no se puede guardar, la presentación vuelve a aparecer la próxima vez: no pasa nada.
   }
 }
+
+// Si los novios eligieron "Más tarde" en los primeros pasos: el Inicio deja de llevarlos ahí
+// y les muestra una tarjeta para retomarlos. Se guarda por cuenta.
+function postponedKey(userId: string) {
+  return `wedshare.firstStepsPostponed.${userId}`;
+}
+
+export function hasPostponedFirstSteps(userId: string) {
+  try {
+    return localStorage.getItem(postponedKey(userId)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function postponeFirstSteps(userId: string) {
+  try {
+    localStorage.setItem(postponedKey(userId), '1');
+  } catch {
+    // Si no se puede guardar, la próxima vez vuelven a aparecer los primeros pasos.
+  }
+}
