@@ -16,6 +16,10 @@ export function authErrorMessage(error: AuthError) {
       return 'Ya hay una cuenta con este email. Probá ingresar.';
     case 'weak_password':
       return `La contraseña tiene que tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`;
+    case 'otp_expired':
+      return 'El código no es correcto o ya venció. Revisalo o pedí uno nuevo.';
+    case 'same_password':
+      return 'La contraseña nueva tiene que ser distinta de la anterior.';
     case 'email_address_invalid':
       return 'Revisá el email: parece que no es válido.';
     case 'over_request_rate_limit':

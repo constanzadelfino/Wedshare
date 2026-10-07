@@ -8,6 +8,10 @@ import { supabase } from './supabaseClient';
 // Si sale bien no hay error; si no, trae el mensaje ya traducido para mostrar.
 export type AuthResult = { error?: string };
 
+// Quiénes escuchan los cambios de sesión, y si por ahora no hay que avisarles (ver resetPassword).
+const authListeners = new Set<(user: User | null) => void>();
+let holdAuthChanges = false;
+
 function toUser(supabaseUser: SupabaseUser): User {
   return {
     id: supabaseUser.id,
@@ -65,6 +69,38 @@ export async function signInWithGoogle(): Promise<AuthResult> {
   return sessionError ? { error: authErrorMessage(sessionError) } : {};
 }
 
+// Recuperar contraseña, paso 1: Supabase manda un mail con un código.
+// Si el email no tiene cuenta no avisa (así nadie puede averiguar qué emails están registrados).
+export async function sendPasswordResetCode(email: string): Promise<AuthResult> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  return error ? { error: authErrorMessage(error) } : {};
+}
+
+// Recuperar contraseña, paso 2: con el código se abre una sesión y se guarda la contraseña nueva.
+// Mientras tanto la app no pasa al Inicio, así un error al guardar la contraseña se ve en la pantalla.
+// Si el código ya se usó y falló la contraseña, el reintento no lo vuelve a pedir.
+export async function resetPassword(email: string, code: string, password: string): Promise<AuthResult> {
+  holdAuthChanges = true;
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) {
+    const { error } = await supabase.auth.verifyOtp({ email, token: code, type: 'recovery' });
+    if (error) {
+      holdAuthChanges = false;
+      return { error: authErrorMessage(error) };
+    }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    return { error: authErrorMessage(error) };
+  }
+
+  holdAuthChanges = false;
+  const user = await getCurrentUser();
+  authListeners.forEach((listener) => listener(user));
+  return {};
+}
+
 export async function signOut(): Promise<AuthResult> {
   const { error } = await supabase.auth.signOut();
   return error ? { error: authErrorMessage(error) } : {};
@@ -78,8 +114,14 @@ export async function getCurrentUser(): Promise<User | null> {
 
 // Avisa en cada ingreso, registro o cierre de sesión. Devuelve la función para dejar de escuchar.
 export function onAuthChange(callback: (user: User | null) => void) {
+  authListeners.add(callback);
   const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-    callback(session ? toUser(session.user) : null);
+    if (!holdAuthChanges) {
+      callback(session ? toUser(session.user) : null);
+    }
   });
-  return () => data.subscription.unsubscribe();
+  return () => {
+    authListeners.delete(callback);
+    data.subscription.unsubscribe();
+  };
 }
