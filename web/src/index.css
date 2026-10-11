@@ -414,3 +414,21 @@
 .opening-leave {
   animation: fade-out 350ms ease-in 650ms forwards;
 }
+
+/* Textos legales (/terminos y /privacidad). */
+.legal-text p,
+.legal-text li {
+  font-size: 16px;
+  line-height: 1.6;
+}
+.legal-text p {
+  margin: 0 0 12px;
+}
+.legal-text ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  list-style: disc;
+}
+.legal-text li {
+  margin-bottom: 8px;
+}
