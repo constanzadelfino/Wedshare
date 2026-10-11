@@ -16,11 +16,16 @@ import { fonts, text } from '../../theme/typography';
 // Elegí una plantilla (pantalla 09 del diseño, sin los filtros por estilo: con cuatro plantillas
 // no hacen falta). "Vista previa" muestra la invitación con la plantilla marcada sin guardarla.
 // Con ?inicio=1 es el paso 2 de los primeros pasos: sin volver, con "Elegir después".
+// Fuera de los primeros pasos, la guardada lleva "Actual" y el botón dice cuál se va a usar
+// ("Usar Noche azul"), o "Listo" si la marcada es la que ya tiene.
 export default function PlantillaScreen() {
   const onboarding = useLocalSearchParams<{ inicio?: string }>().inicio === '1';
   const finishOnboarding = () => router.replace('/invitacion-lista');
   const choose = useChooseTemplate(onboarding ? finishOnboarding : () => router.back());
   const preview = useInvitationPreview(choose.event?.id);
+  const current = onboarding ? undefined : choose.event?.template;
+  const selectedName = TEMPLATES.find((template) => template.id === choose.selected)?.name;
+  const saveTitle = choose.selected === current ? 'Listo' : `Usar ${selectedName}`;
 
   return (
     <Screen
@@ -40,8 +45,8 @@ export default function PlantillaScreen() {
                   icon={<EyeIcon />}
                 />
               </View>
-              <View style={styles.footerButton}>
-                <Button title="Usar plantilla" loading={choose.saving} onPress={choose.saveTemplate} />
+              <View style={styles.saveButton}>
+                <Button title={saveTitle} loading={choose.saving} onPress={choose.saveTemplate} />
               </View>
             </View>
             {onboarding ? (
@@ -81,6 +86,7 @@ export default function PlantillaScreen() {
                 key={template.id}
                 template={template}
                 selected={template.id === choose.selected}
+                current={template.id === current}
                 onPress={() => choose.select(template.id)}
               />
             ))}
@@ -94,10 +100,12 @@ export default function PlantillaScreen() {
 function TemplateCard({
   template,
   selected,
+  current,
   onPress,
 }: {
   template: TemplateInfo;
   selected: boolean;
+  current: boolean;
   onPress: () => void;
 }) {
   return (
@@ -105,7 +113,7 @@ function TemplateCard({
       onPress={onPress}
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
-      accessibilityLabel={`${template.name}, ${template.style}`}
+      accessibilityLabel={`${template.name}, ${template.style}${current ? ', actual' : ''}`}
       style={({ pressed }) => [styles.card, selected && styles.cardSelected, pressed && styles.pressed]}
     >
       <TemplateThumbnail template={template} />
@@ -118,6 +126,11 @@ function TemplateCard({
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.card} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
             <Path d="M5 12l5 5L20 7" />
           </Svg>
+        </View>
+      ) : null}
+      {current ? (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>Actual</Text>
         </View>
       ) : null}
     </Pressable>
@@ -184,6 +197,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  badge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 12,
+    letterSpacing: 0.4,
+    color: colors.accentText,
+  },
   footer: {
     width: '100%',
     gap: 10,
@@ -218,5 +249,9 @@ const styles = StyleSheet.create({
   },
   footerButton: {
     flex: 1,
+  },
+  // Más ancho para que entre "Usar Rosa romántico" en una línea.
+  saveButton: {
+    flex: 1.4,
   },
 });
