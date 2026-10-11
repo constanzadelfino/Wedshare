@@ -91,6 +91,16 @@ export default function PerfilScreen() {
             </Svg>
           }
         />
+        <Row
+          title="Términos y privacidad"
+          onPress={contact.openTerms}
+          icon={
+            <Svg {...quickActionIconProps}>
+              <Path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+              <Path d="M14 3v5h5M9 13h6M9 17h6" />
+            </Svg>
+          }
+        />
       </View>
       {contact.notice ? <Text style={styles.notice}>{contact.notice}</Text> : null}
 

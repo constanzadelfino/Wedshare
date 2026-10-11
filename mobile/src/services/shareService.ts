@@ -24,6 +24,11 @@ export function buildPreviewLink(previewToken: string, template?: TemplateId) {
   return template ? `${link}?plantilla=${template}` : link;
 }
 
+// Link de los textos legales (/terminos), en la misma web que las invitaciones.
+export function buildTermsLink() {
+  return inviteBaseUrl ? `${inviteBaseUrl.replace(/\/invitacion$/, '')}/terminos` : null;
+}
+
 // Abre un link en el navegador del celular.
 export function openLink(url: string) {
   return Linking.openURL(url);
