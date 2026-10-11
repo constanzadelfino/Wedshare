@@ -13,10 +13,14 @@ const authListeners = new Set<(user: User | null) => void>();
 let holdAuthChanges = false;
 
 function toUser(supabaseUser: SupabaseUser): User {
+  const providers: string[] = supabaseUser.app_metadata?.providers ?? [];
   return {
     id: supabaseUser.id,
     email: supabaseUser.email ?? '',
-    name: supabaseUser.user_metadata?.full_name,
+    // display_name es el que se cambia desde Perfil. Va aparte de full_name porque Google
+    // vuelve a escribir full_name cada vez que se entra con Google.
+    name: supabaseUser.user_metadata?.display_name ?? supabaseUser.user_metadata?.full_name,
+    hasPassword: providers.includes('email'),
   };
 }
 
@@ -99,6 +103,35 @@ export async function resetPassword(email: string, code: string, password: strin
   const user = await getCurrentUser();
   authListeners.forEach((listener) => listener(user));
   return {};
+}
+
+// Perfil: cambiar el nombre de la cuenta (no el de los novios en la invitación).
+export async function updateName(name: string): Promise<AuthResult> {
+  const { error } = await supabase.auth.updateUser({ data: { display_name: name } });
+  return error ? { error: authErrorMessage(error) } : {};
+}
+
+// Perfil: cambiar la contraseña. Primero se confirma la actual, por si el celular quedó
+// desbloqueado en manos de otra persona.
+export async function changePassword(currentPassword: string, newPassword: string): Promise<AuthResult> {
+  const { data } = await supabase.auth.getSession();
+  const email = data.session?.user.email;
+  if (!email) {
+    return { error: 'Tu sesión venció. Volvé a ingresar.' };
+  }
+
+  const { error: checkError } = await supabase.auth.signInWithPassword({ email, password: currentPassword });
+  if (checkError) {
+    return {
+      error:
+        checkError.code === 'invalid_credentials'
+          ? 'La contraseña actual no es correcta.'
+          : authErrorMessage(checkError),
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  return error ? { error: authErrorMessage(error) } : {};
 }
 
 export async function signOut(): Promise<AuthResult> {
