@@ -30,6 +30,10 @@ export function PrivacyPage() {
             guarda cifrado y solo lo usamos para eso: no leemos el resto de tu calendario. Si lo desconectás,
             sacamos esos eventos del calendario y borramos el permiso.
           </li>
+          <li>
+            <strong>Avisos al celular, si los activás:</strong> un código que identifica tu celular para mandarte
+            avisos cuando un grupo responde. Se borra al cerrar sesión o al apagar los avisos desde Perfil.
+          </li>
         </ul>
       </LegalSection>
 
@@ -81,6 +85,10 @@ export function PrivacyPage() {
             <strong>Google:</strong> el inicio de sesión con Google, la búsqueda de direcciones al cargar los
             lugares (Google recibe lo que escribís en el buscador), Google Calendar si los novios lo conectan y
             las fuentes tipográficas de la invitación.
+          </li>
+          <li>
+            <strong>Expo:</strong> entrega los avisos al celular de los novios, junto con Apple o Google. Recibe el
+            texto del aviso, que puede incluir el nombre del grupo que respondió.
           </li>
           <li>
             <strong>Spotify:</strong> si los novios suman su playlist, la invitación muestra el reproductor de

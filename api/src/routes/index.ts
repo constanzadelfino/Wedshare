@@ -10,6 +10,7 @@ import { giftRoutes } from './giftRoutes';
 import { guestGroupRoutes } from './guestGroupRoutes';
 import { invitationRoutes } from './invitationRoutes';
 import { placesRoutes } from './placesRoutes';
+import { pushTokenRoutes } from './pushTokenRoutes';
 
 // Cada ruta apunta a la función del controlador que la atiende.
 export const router = Router();
@@ -22,5 +23,6 @@ router.use('/event-items', eventItemRoutes);
 router.use('/gifts', giftRoutes);
 router.use('/guest-groups', guestGroupRoutes);
 router.use('/places', placesRoutes);
+router.use('/push-tokens', pushTokenRoutes);
 router.use('/invitations', invitationRoutes);
 router.use('/entry-passes', entryRoutes);

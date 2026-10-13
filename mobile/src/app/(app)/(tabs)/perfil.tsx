@@ -8,8 +8,10 @@ import { FormError } from '../../../components/FormError';
 import { Logo } from '../../../components/Logo';
 import { quickActionIconProps } from '../../../components/QuickAction';
 import { Screen } from '../../../components/Screen';
+import { ToggleRow } from '../../../components/ToggleRow';
 import { useAuth } from '../../../context/AuthContext';
 import { useContact } from '../../../controllers/useContact';
+import { useNotificationsSetting } from '../../../controllers/useNotifications';
 import { useSignOut } from '../../../controllers/useSignOut';
 import { colors } from '../../../theme/colors';
 import { fonts, text } from '../../../theme/typography';
@@ -20,6 +22,7 @@ export default function PerfilScreen() {
   const { user } = useAuth();
   const signOut = useSignOut();
   const contact = useContact();
+  const notifications = useNotificationsSetting();
   const initial = (user?.name?.trim() || user?.email || '?').charAt(0).toUpperCase();
 
   return (
@@ -68,6 +71,26 @@ export default function PerfilScreen() {
           />
         ) : null}
       </View>
+
+      <Text style={styles.section}>Avisos</Text>
+      <ToggleRow
+        title="Respuestas de invitados"
+        subtitle="Te avisamos cuando un grupo confirma o cambia su respuesta"
+        value={notifications.enabled}
+        onChange={notifications.toggle}
+        icon={
+          <Svg {...quickActionIconProps}>
+            <Path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+            <Path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+          </Svg>
+        }
+      />
+      <FormError message={notifications.error} />
+      {notifications.showSettings ? (
+        <Pressable onPress={notifications.openSettings} accessibilityRole="button" style={styles.settingsLink}>
+          <Text style={styles.settingsLinkText}>Abrir Ajustes</Text>
+        </Pressable>
+      ) : null}
 
       <Text style={styles.section}>Ayuda</Text>
       <View style={styles.list}>
@@ -287,6 +310,19 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontSize: 14,
     color: colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  settingsLink: {
+    minHeight: 44,
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+    marginTop: -8,
+  },
+  settingsLinkText: {
+    fontFamily: fonts.semiBold,
+    fontStyle: 'normal',
+    fontSize: 14,
+    color: colors.accentText,
     textDecorationLine: 'underline',
   },
   version: {

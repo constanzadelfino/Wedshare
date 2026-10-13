@@ -5,6 +5,7 @@ import { prisma } from '../lib/prisma';
 import { getStorageClient, publicPhotoUrl } from '../lib/storage';
 import { InvitationData, isRsvpClosed, RsvpInput } from '../models/invitation';
 import { toGiftData } from './giftService';
+import { notifyOwner, rsvpMessage } from './pushService';
 
 // Consultas de la web del invitado. No hay sesión: el grupo se busca por su invite_token,
 // y desde ahí solo se llega a su propio evento y su propia respuesta.
@@ -148,7 +149,11 @@ export async function getPreview(previewToken: string): Promise<InvitationData |
 export async function saveRsvp(inviteToken: string, input: RsvpInput, mode: 'create' | 'update') {
   const group = await prisma.guestGroup.findUnique({
     where: { inviteToken },
-    include: { guests: { select: { id: true } }, rsvp: true, event: { select: { rsvpDeadline: true } } },
+    include: {
+      guests: { select: { id: true, name: true } },
+      rsvp: true,
+      event: { select: { rsvpDeadline: true, ownerId: true } },
+    },
   });
   if (!group) {
     throw new RsvpError('No encontramos esta invitación. Revisá el link que te mandaron.', 404);
@@ -202,6 +207,22 @@ export async function saveRsvp(inviteToken: string, input: RsvpInput, mode: 'cre
       });
     }
   });
+
+  // Aviso al celular de los novios.
+  const single = group.guests.length === 1 && group.guests[0].name === group.name;
+  notifyOwner(
+    group.event.ownerId,
+    rsvpMessage({
+      groupId: group.id,
+      groupName: group.name,
+      statuses: input.guests.map((guest) =>
+        guest.attending === null ? 'pending' : guest.attending ? 'confirmed' : 'declined',
+      ),
+      singleName: single ? group.name : null,
+      changed: mode === 'update',
+      newMessage: !!input.message && input.message !== group.rsvp?.message,
+    }),
+  );
 
   return (await getInvitation(inviteToken))!;
 }

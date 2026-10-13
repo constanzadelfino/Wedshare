@@ -52,6 +52,13 @@
     "scheme": "wedshare",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1bac22c7-6ff2-4fad-a678-26dd8536221d"
+      }
+    },
+    "owner": "codelfino"
   }
 }

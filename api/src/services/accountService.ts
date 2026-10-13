@@ -40,6 +40,8 @@ export async function deleteAccount(ownerId: string) {
     await prisma.event.delete({ where: { id: event.id } });
   }
 
+  await prisma.pushToken.deleteMany({ where: { ownerId } });
+
   const { error } = await supabase.auth.admin.deleteUser(ownerId);
   if (error && error.status !== 404) {
     throw error;

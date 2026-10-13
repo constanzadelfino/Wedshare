@@ -239,3 +239,15 @@ model Gift {
   @@index([eventId])
   @@map("gifts")
 }
+
+// Celulares de los novios que reciben avisos (por ejemplo, cuando un grupo responde).
+// Una cuenta puede tener más de uno. El token lo da Expo y se borra al cerrar sesión.
+model PushToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  ownerId   String   @map("owner_id") @db.Uuid
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([ownerId])
+  @@map("push_tokens")
+}
