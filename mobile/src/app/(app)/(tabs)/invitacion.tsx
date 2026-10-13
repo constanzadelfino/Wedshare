@@ -46,6 +46,17 @@ export default function InvitacionScreen() {
 
           <View style={styles.list}>
             <QuickAction
+              title="Datos del casamiento"
+              description="Nombre, fecha y lugar"
+              onPress={() => router.push({ pathname: '/crear-evento', params: { editar: '1' } })}
+              icon={
+                <Svg {...quickActionIconProps}>
+                  <Rect x={3} y={4} width={18} height={18} rx={2} />
+                  <Path d="M16 2v4M8 2v4M3 10h18" />
+                </Svg>
+              }
+            />
+            <QuickAction
               title="Plantilla"
               description={TEMPLATES.find((template) => template.id === event.template)?.name ?? 'Elegí el estilo'}
               onPress={() => router.push('/plantilla')}
@@ -55,17 +66,6 @@ export default function InvitacionScreen() {
                   <Rect x={14} y={3} width={7} height={5} rx={1} />
                   <Rect x={14} y={12} width={7} height={9} rx={1} />
                   <Rect x={3} y={16} width={7} height={5} rx={1} />
-                </Svg>
-              }
-            />
-            <QuickAction
-              title="Datos del casamiento"
-              description="Nombre, fecha y lugar"
-              onPress={() => router.push({ pathname: '/crear-evento', params: { editar: '1' } })}
-              icon={
-                <Svg {...quickActionIconProps}>
-                  <Rect x={3} y={4} width={18} height={18} rx={2} />
-                  <Path d="M16 2v4M8 2v4M3 10h18" />
                 </Svg>
               }
             />
