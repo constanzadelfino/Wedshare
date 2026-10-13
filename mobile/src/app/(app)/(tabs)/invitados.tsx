@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import Svg, { Path } from 'react-native-svg';
 
 import { Button } from '../../../components/Button';
+import { EmptyGuestsArt } from '../../../components/EmptyGuestsArt';
 import { FilterChips } from '../../../components/FilterChips';
 import { FormError } from '../../../components/FormError';
 import { GuestGroupCard } from '../../../components/GuestGroupCard';
@@ -11,7 +12,7 @@ import { SearchField } from '../../../components/SearchField';
 import { GuestFilter, useGuests } from '../../../controllers/useGuests';
 import { isSingleGuest } from '../../../models/Guest';
 import { colors } from '../../../theme/colors';
-import { text } from '../../../theme/typography';
+import { fonts, text } from '../../../theme/typography';
 
 const FILTERS: { value: GuestFilter; label: string }[] = [
   { value: 'all', label: 'Todos' },
@@ -22,9 +23,34 @@ const FILTERS: { value: GuestFilter; label: string }[] = [
 
 export default function InvitadosScreen() {
   const guests = useGuests();
+  const isEmpty = !guests.loading && !guests.error && !guests.noEvent && guests.groups.length === 0;
 
   return (
-    <Screen topSpacing={56} gap={14}>
+    <Screen
+      topSpacing={56}
+      gap={14}
+      footer={
+        isEmpty ? (
+          <Button
+            title="Agregar invitados"
+            onPress={() => router.push('/agregar-invitados')}
+            icon={
+              <Svg
+                width={20}
+                height={20}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={colors.card}
+                strokeWidth={2.2}
+                strokeLinecap="round"
+              >
+                <Path d="M12 5v14M5 12h14" />
+              </Svg>
+            }
+          />
+        ) : null
+      }
+    >
       <View style={styles.header}>
         <Text style={[text.screenTitle, styles.title]} accessibilityRole="header">
           Invitados
@@ -61,10 +87,14 @@ export default function InvitadosScreen() {
           <Text style={text.body}>Primero creá tu evento para poder agregar invitados.</Text>
           <Button title="Crear evento" onPress={() => router.push('/crear-evento')} />
         </>
-      ) : guests.groups.length === 0 ? (
-        <Text style={text.body}>
-          Todavía no agregaste invitados. Tocá el botón de arriba para sumar a los primeros.
-        </Text>
+      ) : isEmpty ? (
+        <View style={styles.empty}>
+          <EmptyGuestsArt />
+          <Text style={styles.emptyTitle}>Tu lista de invitados empieza acá</Text>
+          <Text style={[text.body, styles.emptyText]}>
+            Sumá a cada persona o familia, y después les mandás la invitación por WhatsApp desde la app.
+          </Text>
+        </View>
       ) : (
         <>
           <SearchField
@@ -120,5 +150,23 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.85,
+  },
+  empty: {
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 48,
+    paddingHorizontal: 8,
+  },
+  emptyTitle: {
+    fontFamily: fonts.bold,
+    fontStyle: 'normal',
+    fontSize: 22,
+    lineHeight: 28,
+    color: colors.text,
+    textAlign: 'center',
+    maxWidth: 240,
+  },
+  emptyText: {
+    textAlign: 'center',
   },
 });
