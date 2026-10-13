@@ -1,15 +1,18 @@
 import { InvitationPage } from './views/InvitationPage';
+import { LandingPage } from './views/landing/LandingPage';
 import { PrivacyPage } from './views/PrivacyPage';
 import { StatusScreen } from './views/StatusScreen';
 import { TermsPage } from './views/TermsPage';
 
 // Cada grupo entra por /invitacion/<token>, y los novios ven la vista previa en
-// /invitacion/vista-previa/<token>. /terminos y /privacidad son los textos legales.
-// La landing se suma más adelante.
+// /invitacion/vista-previa/<token>. /terminos y /privacidad son los textos legales, y / es la landing.
 const INVITATION_PATH = /^\/invitacion\/(vista-previa\/)?([^/]+)\/?$/;
 
 export function App() {
   const path = window.location.pathname.replace(/\/$/, '');
+  if (path === '') {
+    return <LandingPage />;
+  }
   if (path === '/terminos') {
     return <TermsPage />;
   }

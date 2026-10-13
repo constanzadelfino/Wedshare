@@ -3,6 +3,7 @@ import { useInvitation } from '../controllers/useInvitation';
 import { useOpening } from '../controllers/useOpening';
 import { useTemplate } from '../controllers/useTemplate';
 import { DEFAULT_TEMPLATE, isTemplateId } from '../models/Template';
+import { EXAMPLE_PREVIEW_TOKEN } from '../utils/example';
 import { coupleInitials } from '../utils/names';
 import { InvitationView } from './InvitationView';
 import { OpeningScreen } from './OpeningScreen';
@@ -31,7 +32,9 @@ export function InvitationPage({ inviteToken, preview }: { inviteToken: string; 
     <TemplateContext.Provider value={template}>
       {preview && (
         <div className="sticky top-0 z-30 bg-dark px-4 py-2.5 text-center text-sm font-semibold text-bg">
-          Vista previa: así ven la invitación tus invitados.
+          {inviteToken === EXAMPLE_PREVIEW_TOKEN
+            ? 'Invitación de ejemplo: los nombres y los datos son inventados.'
+            : 'Vista previa: así ven la invitación tus invitados.'}
         </div>
       )}
       <InvitationView

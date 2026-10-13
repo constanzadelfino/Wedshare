@@ -1,0 +1,45 @@
+/* Estilos de la landing (los del diseño). Las clases llevan "lp-" para no chocar con las de la invitación. */
+.landing {
+  font-style: normal;
+}
+.landing * {
+  box-sizing: border-box;
+}
+.lp-wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.lp-sec { padding: 72px 0; }
+.lp-eyebrow { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px; }
+.lp-h1 { font-size: 46px; line-height: 1.04; font-weight: 300; letter-spacing: -0.015em; }
+.lp-h2 { font-size: 34px; line-height: 1.12; font-weight: 300; letter-spacing: -0.01em; margin: 0 0 14px; }
+.lp-lead { font-size: 18px; line-height: 1.6; }
+.lp-navlinks { display: none; }
+.lp-hero { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: center; padding: 20px 0 56px; }
+/* Sin esto, el dibujo de los celulares (más ancho que la pantalla del celular) ensancha la columna del texto. */
+.lp-hero > *, .lp-frow > *, .lp-cols2 > * { min-width: 0; }
+.lp-phones { position: relative; width: 520px; height: 580px; transform: scale(0.66); transform-origin: top center; margin: 0 auto -200px; }
+.lp-cols2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.lp-frow { display: grid; grid-template-columns: 1fr; gap: 28px; align-items: center; }
+.lp-grid3 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.lp-grid4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 12px; }
+.lp-hscroll { display: flex; gap: 28px; overflow-x: auto; padding: 12px 4px 24px; }
+.landing summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 64px; cursor: pointer; font-size: 19px; font-weight: 600; list-style: none; }
+.landing summary::-webkit-details-marker { display: none; }
+@media (min-width: 900px) {
+  .lp-wrap { padding: 0 40px; }
+  .lp-sec { padding: 120px 0; }
+  .lp-h1 { font-size: 76px; }
+  .lp-h2 { font-size: 50px; }
+  .lp-lead { font-size: 20px; }
+  .lp-navlinks { display: flex; }
+  .lp-hero { grid-template-columns: 1.05fr 1fr; gap: 40px; padding: 40px 0 100px; }
+  .lp-phones { transform: none; margin: 0 auto; }
+  .lp-cols2 { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .lp-frow { grid-template-columns: 1fr 1fr; gap: 72px; }
+  .lp-frow.lp-rev > *:first-child { order: 2; }
+  .lp-grid3 { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .lp-grid4 { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .lp-hscroll { justify-content: center; }
+}
+/* Los dos celulares del QR no entran en los celulares más angostos: se achican un poco. */
+@media (max-width: 440px) {
+  .lp-qr-mock { zoom: 0.88; }
+}
