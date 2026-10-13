@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma';
 import { COVER_PHOTOS_BUCKET, getStorageClient } from '../lib/storage';
+import { disconnectCalendar } from './calendarService';
 
 // Errores al borrar la cuenta, con el mensaje listo para mostrar.
 export class AccountError extends Error {
@@ -34,6 +35,8 @@ export async function deleteAccount(ownerId: string) {
         console.warn('No se pudieron borrar las fotos de la cuenta', error);
       }
     }
+    // Saca del Google Calendar de los novios lo que había agendado Wedshare.
+    await disconnectCalendar(event.id);
     await prisma.event.delete({ where: { id: event.id } });
   }
 

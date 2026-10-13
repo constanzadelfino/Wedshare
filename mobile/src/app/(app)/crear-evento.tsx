@@ -95,9 +95,9 @@ export default function CrearEventoScreen() {
 
           <ToggleRow
             title="Google Calendar"
-            subtitle="Se actualiza si cambia la fecha"
-            value={form.calendarSync}
-            onChange={form.setCalendarSync}
+            subtitle={form.calendarSubtitle}
+            value={form.calendarOn}
+            onChange={form.setCalendarOn}
             icon={
               <Svg {...iconProps}>
                 <Rect x={3} y={4} width={18} height={18} rx={2} />

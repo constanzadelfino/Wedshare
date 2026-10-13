@@ -9,6 +9,7 @@ import {
   publicPhotoUrl,
 } from '../lib/storage';
 import { EventData, EventInput, MAX_ALBUM_PHOTOS, MAX_COVER_PHOTOS } from '../models/event';
+import { disconnectCalendar, scheduleCalendarSync } from './calendarService';
 
 // Todas las consultas filtran por ownerId: cada pareja solo ve y toca sus eventos.
 
@@ -28,7 +29,8 @@ function toEventData(event: Event): EventData {
     name: event.name,
     date: fromDbDate(event.date),
     venue: event.venue,
-    calendarSync: event.calendarSync,
+    calendarStatus: !event.calendarSync ? 'off' : event.calendarRefreshToken ? 'connected' : 'expired',
+    calendarEmail: event.calendarSync ? event.calendarEmail : null,
     playlistEnabled: event.playlistEnabled,
     giftsEnabled: event.giftsEnabled,
     coupleNames: event.coupleNames,
@@ -97,7 +99,12 @@ export async function createEvent(
 // Devuelve null si el evento no existe o es de otra persona.
 export async function updateEvent(ownerId: string, id: string, input: Partial<EventInput>) {
   const { count } = await prisma.event.updateMany({ where: { id, ownerId }, data: toDbData(input) });
-  return count ? getEvent(ownerId, id) : null;
+  if (!count) {
+    return null;
+  }
+  // El nombre, la fecha o el lugar pueden aparecer en el calendario.
+  scheduleCalendarSync(id);
+  return getEvent(ownerId, id);
 }
 
 // Token del link de vista previa. Se crea la primera vez que se pide y después no cambia.
@@ -118,6 +125,10 @@ export async function getPreviewToken(ownerId: string, id: string) {
 
 // Devuelve false si el evento no existe o es de otra persona.
 export async function deleteEvent(ownerId: string, id: string) {
+  if (await prisma.event.count({ where: { id, ownerId } })) {
+    // Saca del Google Calendar de los novios lo que había agendado Wedshare.
+    await disconnectCalendar(id);
+  }
   const { count } = await prisma.event.deleteMany({ where: { id, ownerId } });
   return count > 0;
 }

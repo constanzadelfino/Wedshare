@@ -1,5 +1,9 @@
 import { TemplateId } from './Template';
 
+// Google Calendar de los novios: sin conectar, conectado, o conectado pero con el permiso
+// de Google vencido (hay que volver a conectarlo).
+export type CalendarStatus = 'off' | 'connected' | 'expired';
+
 // Un casamiento, tal como lo devuelve la API.
 export type Event = {
   id: string;
@@ -7,7 +11,9 @@ export type Event = {
   // Formato AAAA-MM-DD.
   date: string;
   venue: string;
-  calendarSync: boolean;
+  calendarStatus: CalendarStatus;
+  // Cuenta de Google conectada.
+  calendarEmail: string | null;
   playlistEnabled: boolean;
   giftsEnabled: boolean;
   // Personalizar → Portada.
@@ -40,12 +46,15 @@ export type Event = {
 
 export type NewEvent = Pick<
   Event,
-  'name' | 'date' | 'venue' | 'calendarSync' | 'playlistEnabled' | 'giftsEnabled'
+  'name' | 'date' | 'venue' | 'playlistEnabled' | 'giftsEnabled'
 > &
   Partial<Pick<Event, 'coupleNames'>>;
 
-// Lo que se puede cambiar desde Personalizar. Las fotos se suben aparte.
-export type EventChanges = Partial<Omit<Event, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls'>>;
+// Lo que se puede cambiar desde Personalizar. Las fotos se suben aparte y Google Calendar
+// se conecta con calendarService.
+export type EventChanges = Partial<
+  Omit<Event, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls' | 'calendarStatus' | 'calendarEmail'>
+>;
 
 export const MAX_COVER_PHOTOS = 3;
 export const MAX_ALBUM_PHOTOS = 8;

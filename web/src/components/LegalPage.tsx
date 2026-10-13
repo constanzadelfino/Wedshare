@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from 'react';
 
 import { HeartLogo } from './HeartLogo';
 
-export const LEGAL_UPDATED = '11 de octubre de 2026';
+export const LEGAL_UPDATED = '13 de octubre de 2026';
 export const CONTACT_EMAIL = 'wedshare.team@gmail.com';
 
 type Props = {

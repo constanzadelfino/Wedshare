@@ -14,7 +14,7 @@ type Question = (typeof FIRST_STEPS_QUESTIONS)[number];
 // Primeros pasos (onboarding después del registro): un saludo y tres preguntas, una por pantalla
 // (nombres, fecha y lugar). Con eso se crea el casamiento y sigue con Elegí una plantilla.
 // Los nombres sirven de nombre del evento y de nombres de los novios en la invitación; lo demás
-// (Google Calendar, módulos) queda con los valores de siempre y se cambia después.
+// (los módulos) queda con los valores de siempre, Google Calendar sin conectar, y se cambia después.
 export function useFirstSteps() {
   const { user } = useAuth();
   // 0 es el saludo; 1 a 3, las preguntas.
@@ -83,7 +83,6 @@ export function useFirstSteps() {
         coupleNames: names.trim(),
         date: isoDate,
         venue: venue.trim(),
-        calendarSync: true,
         playlistEnabled: true,
         giftsEnabled: false,
       });

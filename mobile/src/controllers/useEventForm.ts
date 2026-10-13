@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Event } from '../models/Event';
 import { ApiError } from '../services/apiClient';
+import { connectCalendar, disconnectCalendar, requestCalendarPermission } from '../services/calendarService';
 import { createEvent, getMyEvent, updateEvent } from '../services/eventService';
 import { displayDateToIso, formatDateInput, isoDateToDisplay, todayIso } from '../utils/date';
 
@@ -21,8 +22,12 @@ export function useEventForm(editing: boolean, onDone: () => void) {
   const [name, setName] = useState('');
   const [date, setDate] = useState('');
   const [venue, setVenue] = useState('');
-  // Valores iniciales de los interruptores, como en el diseño.
-  const [calendarSync, setCalendarSync] = useState(true);
+  // Google Calendar: el interruptor, y el permiso de Google recién conseguido, que se le pasa
+  // a la API al guardar. Si el permiso venció, el interruptor arranca apagado.
+  const [calendarOn, setCalendarOn] = useState(false);
+  const [calendarToken, setCalendarToken] = useState<string>();
+  const [askingCalendar, setAskingCalendar] = useState(false);
+  // Valores iniciales de los módulos, como en el diseño.
   const [playlistEnabled, setPlaylistEnabled] = useState(true);
   const [giftsEnabled, setGiftsEnabled] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -42,7 +47,7 @@ export function useEventForm(editing: boolean, onDone: () => void) {
         setName(myEvent.name);
         setDate(isoDateToDisplay(myEvent.date));
         setVenue(myEvent.venue);
-        setCalendarSync(myEvent.calendarSync);
+        setCalendarOn(myEvent.calendarStatus === 'connected');
         setPlaylistEnabled(myEvent.playlistEnabled);
         setGiftsEnabled(myEvent.giftsEnabled);
       })
@@ -51,6 +56,50 @@ export function useEventForm(editing: boolean, onDone: () => void) {
       )
       .finally(() => setLoadingEvent(false));
   }, [editing]);
+
+  // Al prenderlo, se pide el permiso a Google en ese momento (salvo que ya estuviera conectado).
+  async function changeCalendar(value: boolean) {
+    if (askingCalendar) {
+      return;
+    }
+    setFormError(undefined);
+    if (!value || calendarToken || event?.calendarStatus === 'connected') {
+      setCalendarOn(value);
+      return;
+    }
+    setAskingCalendar(true);
+    const permission = await requestCalendarPermission();
+    setAskingCalendar(false);
+    if (permission.error) {
+      setFormError(permission.error);
+    } else if (permission.refreshToken) {
+      setCalendarToken(permission.refreshToken);
+      setCalendarOn(true);
+    }
+  }
+
+  // Texto debajo de "Google Calendar".
+  function calendarSubtitle() {
+    const status = event?.calendarStatus ?? 'off';
+    if (askingCalendar) {
+      return 'Abriendo Google…';
+    }
+    if (calendarOn) {
+      if (calendarToken) {
+        return 'Al guardar, agendamos los eventos del casamiento en tu calendario';
+      }
+      return event?.calendarEmail
+        ? `Agendado en ${event.calendarEmail}. Si cambiás algo, se actualiza solo`
+        : 'Agendado en tu calendario. Si cambiás algo, se actualiza solo';
+    }
+    if (status === 'connected') {
+      return 'Al guardar, sacamos los eventos de tu calendario';
+    }
+    if (status === 'expired') {
+      return 'Se desconectó. Prendelo para volver a conectarlo';
+    }
+    return 'Agendamos el casamiento en tu calendario y lo actualizamos si cambia algo';
+  }
 
   function validate() {
     const errors: FieldErrors = {};
@@ -86,14 +135,18 @@ export function useEventForm(editing: boolean, onDone: () => void) {
         name: name.trim(),
         date: isoDate,
         venue: venue.trim(),
-        calendarSync,
         playlistEnabled,
         giftsEnabled,
       };
-      if (event) {
-        await updateEvent(event.id, data);
-      } else {
-        await createEvent(data);
+      const saved = event ? await updateEvent(event.id, data) : await createEvent(data);
+      // Si falla lo del calendario, el casamiento ya quedó guardado: el próximo Guardar edita.
+      setEvent(saved);
+
+      if (calendarOn && calendarToken) {
+        await connectCalendar(calendarToken);
+        setCalendarToken(undefined);
+      } else if (!calendarOn && saved.calendarStatus !== 'off') {
+        await disconnectCalendar();
       }
       onDone();
     } catch (error) {
@@ -113,8 +166,9 @@ export function useEventForm(editing: boolean, onDone: () => void) {
     setDate: (value: string) => setDate(formatDateInput(value)),
     venue,
     setVenue,
-    calendarSync,
-    setCalendarSync,
+    calendarOn,
+    setCalendarOn: changeCalendar,
+    calendarSubtitle: calendarSubtitle(),
     playlistEnabled,
     setPlaylistEnabled,
     giftsEnabled,

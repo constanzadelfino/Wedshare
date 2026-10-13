@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { getHealth } from '../controllers/healthController';
 import { accountRoutes } from './accountRoutes';
+import { calendarRoutes } from './calendarRoutes';
 import { entryRoutes } from './entryRoutes';
 import { eventItemRoutes } from './eventItemRoutes';
 import { eventRoutes } from './eventRoutes';
@@ -15,6 +16,7 @@ export const router = Router();
 
 router.get('/health', getHealth);
 router.use('/account', accountRoutes);
+router.use('/calendar', calendarRoutes);
 router.use('/events', eventRoutes);
 router.use('/event-items', eventItemRoutes);
 router.use('/gifts', giftRoutes);

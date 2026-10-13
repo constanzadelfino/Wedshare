@@ -20,8 +20,10 @@ model Event {
   date            DateTime @db.Date
   // Salón o dirección.
   venue           String
-  // "Google Calendar: se actualiza si cambia la fecha".
-  calendarSync    Boolean  @default(true) @map("calendar_sync")
+  // "Google Calendar: se actualiza si cambia la fecha". Prendido quiere decir que los novios
+  // conectaron su Google Calendar; si además falta el token, el permiso venció y hay que
+  // volver a conectarlo.
+  calendarSync    Boolean  @default(false) @map("calendar_sync")
   // Módulos opcionales.
   playlistEnabled Boolean  @default(true) @map("playlist_enabled")
   giftsEnabled    Boolean  @default(true) @map("gifts_enabled")
@@ -62,6 +64,14 @@ model Event {
   // Link para que los novios vean su invitación con una familia de ejemplo.
   // Es distinto de los links de los invitados y se crea la primera vez que se pide.
   previewToken String? @unique @map("preview_token")
+
+  // Google Calendar de los novios. El token permite crear eventos en su calendario: se guarda
+  // cifrado (ver lib/secretBox.ts) y nunca vuelve a la app.
+  calendarRefreshToken String? @map("calendar_refresh_token")
+  // Cuenta de Google conectada, para mostrarla en la app.
+  calendarEmail        String? @map("calendar_email")
+  // Evento de todo el día que se crea mientras no hay civil, ceremonia ni festejo cargados.
+  calendarAllDayId     String? @map("calendar_all_day_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -105,6 +115,8 @@ model EventItem {
   placeId   String?  @map("place_id")
   latitude  Float?
   longitude Float?
+  // Id del evento en el Google Calendar de los novios, si lo conectaron.
+  googleEventId String? @map("google_event_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

@@ -24,6 +24,12 @@ export function PrivacyPage() {
             textos, las fotos, el dress code, el link de la playlist, los regalos y, si la cargás, la cuenta
             bancaria para transferencias (titular, alias y CBU).
           </li>
+          <li>
+            <strong>Tu Google Calendar, si lo conectás:</strong> el email de la cuenta de Google y un permiso que
+            Google nos da para crear, cambiar y borrar en tu calendario los eventos del casamiento. El permiso se
+            guarda cifrado y solo lo usamos para eso: no leemos el resto de tu calendario. Si lo desconectás,
+            sacamos esos eventos del calendario y borramos el permiso.
+          </li>
         </ul>
       </LegalSection>
 
@@ -68,12 +74,13 @@ export function PrivacyPage() {
         <p>Para funcionar, Wedshare se apoya en otras empresas que procesan algunos datos por nosotros:</p>
         <ul>
           <li>
-            <strong>Supabase:</strong> guarda la base de datos, las fotos y las cuentas. Sus servidores pueden estar
-            fuera de la Argentina.
+            <strong>Supabase:</strong> guarda la base de datos, las fotos y las cuentas. Sus servidores están en
+            San Pablo, Brasil.
           </li>
           <li>
             <strong>Google:</strong> el inicio de sesión con Google, la búsqueda de direcciones al cargar los
-            lugares (Google recibe lo que escribís en el buscador) y las fuentes tipográficas de la invitación.
+            lugares (Google recibe lo que escribís en el buscador), Google Calendar si los novios lo conectan y
+            las fuentes tipográficas de la invitación.
           </li>
           <li>
             <strong>Spotify:</strong> si los novios suman su playlist, la invitación muestra el reproductor de
@@ -94,7 +101,8 @@ export function PrivacyPage() {
       <LegalSection title="8. Cuánto tiempo los guardamos">
         <p>
           Guardamos los datos mientras la cuenta de los novios exista. Si eliminan la cuenta desde Perfil, se
-          borran su casamiento, sus invitados con sus respuestas y sus fotos.
+          borran su casamiento, sus invitados con sus respuestas y sus fotos, y sacamos de su Google Calendar los
+          eventos que había agendado Wedshare.
         </p>
       </LegalSection>
 

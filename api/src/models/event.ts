@@ -2,6 +2,10 @@
 export const TEMPLATES = ['dorado', 'rosa', 'noche', 'minimal'] as const;
 export type TemplateId = (typeof TEMPLATES)[number];
 
+// Google Calendar de los novios: sin conectar, conectado, o conectado pero con el permiso
+// vencido (hay que volver a conectarlo).
+export type CalendarStatus = 'off' | 'connected' | 'expired';
+
 // Datos de un evento tal como los manda y los recibe la app.
 // La tabla en sí está definida en prisma/schema.prisma.
 export type EventData = {
@@ -10,7 +14,9 @@ export type EventData = {
   // Formato AAAA-MM-DD.
   date: string;
   venue: string;
-  calendarSync: boolean;
+  calendarStatus: CalendarStatus;
+  // Cuenta de Google conectada.
+  calendarEmail: string | null;
   playlistEnabled: boolean;
   giftsEnabled: boolean;
   // Personalizar → Portada.
@@ -42,15 +48,18 @@ export type EventData = {
   template: TemplateId;
 };
 
-// Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta.
-export type EventInput = Omit<EventData, 'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls'>;
+// Lo que la app puede mandar al crear o editar. Las fotos se suben por otra ruta y
+// Google Calendar se conecta y desconecta en /calendar/connection.
+export type EventInput = Omit<
+  EventData,
+  'id' | 'coverPhotoUrls' | 'storyPhotoUrl' | 'albumPhotoUrls' | 'calendarStatus' | 'calendarEmail'
+>;
 
 export const MAX_COVER_PHOTOS = 3;
 export const MAX_ALBUM_PHOTOS = 8;
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const BOOLEAN_FIELDS = [
-  'calendarSync',
   'playlistEnabled',
   'giftsEnabled',
   'coverWithoutPhotos',

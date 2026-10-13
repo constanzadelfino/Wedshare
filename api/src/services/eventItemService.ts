@@ -1,6 +1,7 @@
 import { EventItem } from '../../generated/prisma/client';
 import { prisma } from '../lib/prisma';
 import { EventItemData, EventItemInput } from '../models/eventItem';
+import { scheduleCalendarRemoval, scheduleCalendarSync } from './calendarService';
 
 // Siempre se buscan a través del evento del usuario: cada pareja solo ve y toca lo suyo.
 
@@ -36,6 +37,7 @@ export async function createEventItem(eventId: string, input: EventItemInput) {
   const item = await prisma.eventItem.create({
     data: { ...input, eventId, date: new Date(`${input.date}T00:00:00Z`) },
   });
+  scheduleCalendarSync(eventId);
   return toEventItemData(item);
 }
 
@@ -45,11 +47,16 @@ export async function updateEventItem(eventId: string, id: string, input: Partia
   if (!count) {
     return null;
   }
+  scheduleCalendarSync(eventId);
   return toEventItemData(await prisma.eventItem.findUniqueOrThrow({ where: { id } }));
 }
 
 // Devuelve false si no existe o es de otro evento.
 export async function deleteEventItem(eventId: string, id: string) {
+  const item = await prisma.eventItem.findFirst({ where: { id, eventId }, select: { googleEventId: true } });
   const { count } = await prisma.eventItem.deleteMany({ where: { id, eventId } });
+  if (count > 0) {
+    scheduleCalendarRemoval(eventId, item?.googleEventId ?? null);
+  }
   return count > 0;
 }
