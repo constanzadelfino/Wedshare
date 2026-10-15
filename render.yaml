@@ -5,7 +5,7 @@ services:
     name: wedshare-api
     runtime: node
     plan: free
-    region: oregon
+    region: virginia
     rootDir: api
     buildCommand: npm ci && npx prisma generate
     startCommand: npm start
