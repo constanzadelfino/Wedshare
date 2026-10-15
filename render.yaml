@@ -1,0 +1,27 @@
+# Configuración de la API de Wedshare en Render (Blueprint).
+# Las claves no van acá: Render las pide al crear el servicio (sync: false).
+services:
+  - type: web
+    name: wedshare-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: api
+    buildCommand: npm ci && npx prisma generate
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: CALENDAR_TOKEN_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
