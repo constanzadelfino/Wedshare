@@ -10,6 +10,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.codelfino.wedshare",
       "adaptiveIcon": {
         "backgroundColor": "#F7F1E6",
         "foregroundImage": "./assets/android-icon-foreground.png",
