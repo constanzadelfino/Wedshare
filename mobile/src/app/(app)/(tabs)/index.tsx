@@ -161,7 +161,7 @@ function Hero({ title, subtitle }: { title: string; subtitle: string }) {
 
   return (
     <View style={[styles.hero, { height: 270 + insets.top }]}>
-      <Image source={HOME_PHOTO} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
+      <Image source={HOME_PHOTO} style={styles.heroPhoto} resizeMode="cover" accessibilityIgnoresInvertColors />
       <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none">
         <Defs>
           <LinearGradient id="heroShade" x1="0" y1="0" x2="0" y2="1">
@@ -321,6 +321,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     overflow: 'hidden',
     backgroundColor: colors.darkBrown,
+  },
+  heroPhoto: {
+    // En Android la foto toma su tamaño en píxeles si no se le da uno: se ve gigante y borrosa.
+    ...StyleSheet.absoluteFill,
+    width: '100%',
+    height: '100%',
   },
   heroTexts: {
     gap: 4,
