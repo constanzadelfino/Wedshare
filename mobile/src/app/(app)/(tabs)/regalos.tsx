@@ -2,29 +2,35 @@ import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Button } from '../../components/Button';
-import { FormError } from '../../components/FormError';
-import { GiftTypeIcon } from '../../components/GiftTypeIcon';
-import { Screen } from '../../components/Screen';
-import { ScreenHeader } from '../../components/ScreenHeader';
-import { ToggleRow } from '../../components/ToggleRow';
-import { useGifts } from '../../controllers/useGifts';
-import { Gift, GIFT_METHOD_LABELS } from '../../models/Gift';
-import { colors } from '../../theme/colors';
-import { fonts, text } from '../../theme/typography';
-import { formatPrice } from '../../utils/money';
-import { maskCbu } from '../../utils/validation';
+import { Button } from '../../../components/Button';
+import { FormError } from '../../../components/FormError';
+import { GiftTypeIcon } from '../../../components/GiftTypeIcon';
+import { Screen } from '../../../components/Screen';
+import { Logo } from '../../../components/Logo';
+import { ToggleRow } from '../../../components/ToggleRow';
+import { useGifts } from '../../../controllers/useGifts';
+import { Gift, GIFT_METHOD_LABELS } from '../../../models/Gift';
+import { colors } from '../../../theme/colors';
+import { fonts, text } from '../../../theme/typography';
+import { formatPrice } from '../../../utils/money';
+import { maskCbu } from '../../../utils/validation';
 
-// Regalos (pantalla 08 del diseño, simplificada con Constanza): si se muestran en la
-// invitación, la lista de regalos, la cuenta para transferencias y el buzón.
+// Pestaña Regalos (pantalla 08 del diseño, simplificada con Constanza): si se muestran en la
+// invitación, la lista de regalos, la cuenta para transferencias y el buzón. Ocupa el lugar
+// que tenía la pestaña QR, para que los novios la tengan a mano (pedido de Constanza).
 export default function RegalosScreen() {
   const gifts = useGifts();
   const event = gifts.event;
   const hasBank = !!(event?.giftAlias || event?.giftCbu);
 
   return (
-    <Screen topSpacing={56} gap={14}>
-      <ScreenHeader title="Regalos" showLogo={false} />
+    <Screen topSpacing={64} gap={14}>
+      <View style={styles.header}>
+        <Text style={[text.screenTitle, styles.title]} accessibilityRole="header">
+          Regalos
+        </Text>
+        <Logo width={34} />
+      </View>
 
       {gifts.loading ? (
         <ActivityIndicator color={colors.accent} />
@@ -130,6 +136,14 @@ function GiftRow({ gift }: { gift: Gift }) {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  title: {
+    flex: 1,
+  },
   section: {
     marginTop: 8,
   },

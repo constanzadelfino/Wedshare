@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -41,13 +40,12 @@ function GuestsIcon({ color }: IconProps) {
   );
 }
 
-function QrIcon({ color }: IconProps) {
+// Ícono de regalo de Lucide (licencia ISC), el mismo de "Otro" en GiftTypeIcon.
+function GiftsIcon({ color }: IconProps) {
   return (
     <Svg {...iconSvgProps(color)}>
-      <Rect x={3} y={3} width={7} height={7} />
-      <Rect x={14} y={3} width={7} height={7} />
-      <Rect x={3} y={14} width={7} height={7} />
-      <Path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h1" />
+      <Rect x={3} y={8} width={18} height={4} />
+      <Path d="M12 8v13M19 12v9H5v-9M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5" />
     </Svg>
   );
 }
@@ -70,8 +68,9 @@ function ProfileIcon({ color }: IconProps) {
   );
 }
 
-// Barra de pestañas de abajo: Inicio, Invitados, QR, Invitación y Perfil. Invitación ocupa el
-// lugar que el diseño le daba a Playlist, que ahora está adentro (pedido de Constanza).
+// Barra de pestañas de abajo: Inicio, Invitados, Regalos, Invitación y Perfil. Invitación ocupa el
+// lugar que el diseño le daba a Playlist, que ahora está adentro, y Regalos el de QR: el escáner
+// se abre desde el Inicio (pedidos de Constanza).
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(16, insets.bottom);
@@ -106,16 +105,9 @@ export default function TabsLayout() {
         name="invitados"
         options={{ title: 'Invitados', tabBarIcon: ({ color }) => <GuestsIcon color={color} /> }}
       />
-      {/* El escáner ocupa toda la pantalla (sin la barra), así que la pestaña lo abre encima. */}
       <Tabs.Screen
-        name="qr"
-        options={{ title: 'QR', tabBarIcon: ({ color }) => <QrIcon color={color} /> }}
-        listeners={{
-          tabPress: (event) => {
-            event.preventDefault();
-            router.push('/escanear');
-          },
-        }}
+        name="regalos"
+        options={{ title: 'Regalos', tabBarIcon: ({ color }) => <GiftsIcon color={color} /> }}
       />
       <Tabs.Screen
         name="invitacion"

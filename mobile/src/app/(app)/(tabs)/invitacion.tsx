@@ -4,7 +4,6 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { Button } from '../../../components/Button';
 import { FormError } from '../../../components/FormError';
-import { GiftTypeIcon } from '../../../components/GiftTypeIcon';
 import { Logo } from '../../../components/Logo';
 import { QuickAction, quickActionIconProps } from '../../../components/QuickAction';
 import { Screen } from '../../../components/Screen';
@@ -16,6 +15,7 @@ import { text } from '../../../theme/typography';
 
 // Pestaña Invitación (no está en el diseño, pedido de Constanza): junta todo lo que se ve en la
 // invitación, con "Ver mi invitación" bien a mano. Ocupa el lugar que el diseño le daba a Playlist.
+// Regalos tiene su propia pestaña.
 export default function InvitacionScreen() {
   const { event, loading, error } = useMyEvent();
   const preview = useInvitationPreview(event?.id);
@@ -101,12 +101,6 @@ export default function InvitacionScreen() {
                   <Path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </Svg>
               }
-            />
-            <QuickAction
-              title="Regalos"
-              description="Regalos, cuenta y buzón"
-              onPress={() => router.push('/regalos')}
-              icon={<GiftTypeIcon type="other" color={colors.accent} />}
             />
             <QuickAction
               title="Playlist"
