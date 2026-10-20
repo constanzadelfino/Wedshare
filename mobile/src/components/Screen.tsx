@@ -11,9 +11,12 @@ type Props = {
   gap: number;
   // Contenido que va abajo de todo, como "¿No tenés cuenta? Registrate".
   footer?: ReactNode;
+  // Sin espacio arriba, para una foto que llega hasta el borde (el Inicio). La pantalla se
+  // encarga de dejar lugar para la barra de estado.
+  fullBleedTop?: boolean;
 };
 
-export function Screen({ children, topSpacing, gap, footer }: Props) {
+export function Screen({ children, topSpacing, gap, footer, fullBleedTop = false }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -23,7 +26,7 @@ export function Screen({ children, topSpacing, gap, footer }: Props) {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: Math.max(topSpacing, insets.top + 12),
+            paddingTop: fullBleedTop ? 0 : Math.max(topSpacing, insets.top + 12),
             paddingBottom: Math.max(28, insets.bottom + 12),
           },
         ]}
