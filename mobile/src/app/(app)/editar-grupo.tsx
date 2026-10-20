@@ -59,7 +59,7 @@ export default function EditarGrupoScreen() {
         <>
           <View style={styles.shareCard}>
             <Text style={text.sectionLabel}>Invitación</Text>
-            <Text style={styles.link} numberOfLines={1} selectable>
+            <Text style={styles.link} numberOfLines={1} ellipsizeMode="middle">
               {form.link ?? 'Link no disponible'}
             </Text>
             <Button
